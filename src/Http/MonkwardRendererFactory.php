@@ -34,7 +34,7 @@ final class MonkwardRendererFactory implements RendererFactoryInterface
         }
 
         $templatePath = match (true) {
-            $normalizedRequestPath === '_root' => 'index',
+            $normalizedRequestPath === 'index' => 'index',
             \str_starts_with($normalizedRequestPath, 'error') => $normalizedRequestPath,
             default => 'doc',
         };

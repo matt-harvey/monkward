@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Monkward\Console;
 
-use Monkward\Actions\ActionTreeGenerator;
 use Monkward\Config\Theme;
 use Monkward\Config\ThemeManager;
 use Monkward\Config\UserConfig;
@@ -54,7 +53,6 @@ final class Application
             [$target, $singleFile] = $this->resolveTarget($args->path);
 
             $this->workspace = $this->createWorkspace();
-            (new ActionTreeGenerator())->generate($this->workspace);
             $this->registerShutdown();
             $this->registerSignalHandlers();
 
@@ -152,7 +150,6 @@ final class Application
         $env = \array_merge(\getenv(), [
             'MONKWARD_TARGET' => $target,
             'MONKWARD_SINGLE_FILE' => $singleFile ?? '',
-            'MONKWARD_ACTIONS' => $this->workspace . '/actions',
             'MONKWARD_THEME_CSS_PATH' => $themeCssPath,
             'MONKWARD_IGNORE' => \json_encode(\array_values($ignore), \JSON_THROW_ON_ERROR),
             'MONKWARD_INCLUDE' => \json_encode(\array_values($include), \JSON_THROW_ON_ERROR),

@@ -7,8 +7,12 @@ namespace Monkward\Http;
 use Monkward\Markdown\MarkdownRenderer;
 use Monkward\Site\FileScanner;
 use Monkward\Site\SiteIndex;
+use Psr\Http\Message\ResponseFactoryInterface;
 use SubstancePHP\Container\Container;
+use SubstancePHP\HTTP\ContextFactoryInterface;
 use SubstancePHP\HTTP\EnvironmentInterface;
+use SubstancePHP\HTTP\Middleware\RouteActorMiddleware;
+use SubstancePHP\HTTP\Middleware\RouteMatcherMiddleware;
 use SubstancePHP\HTTP\ProviderInterface;
 use SubstancePHP\HTTP\RendererFactory;
 use SubstancePHP\HTTP\RendererFactoryInterface;
@@ -61,6 +65,17 @@ final class MonkwardProvider implements ProviderInterface
                     htmlEncoding: $c->get('substance.html-encoding'),
                     defaultLayout: $c->get('substance.default-layout'),
                 ),
+            ),
+
+            RouteMatcherMiddleware::class => static fn (Container $c): MonkwardRouteMatcherMiddleware => new MonkwardRouteMatcherMiddleware(
+                assets: $c->get(AssetResponder::class),
+            ),
+
+            RouteActorMiddleware::class => static fn (Container $c): MonkwardRouteActorMiddleware => new MonkwardRouteActorMiddleware(
+                container: $c,
+                contextFactory: $c->get(ContextFactoryInterface::class),
+                rendererFactory: $c->get(RendererFactoryInterface::class),
+                responseFactory: $c->get(ResponseFactoryInterface::class),
             ),
         ];
     }

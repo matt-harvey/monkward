@@ -18,7 +18,7 @@ final class Server
 
         $app = Application::make(
             env: [],
-            actionRoot: \getenv('MONKWARD_ACTIONS') ?: $root . '/app/actions',
+            actionRoot: '', // unused: MonkwardProvider overrides both route middlewares
             templateRoot: $root . '/app/templates',
             providers: [
                 SubstanceProvider::class,

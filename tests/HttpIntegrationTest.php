@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Monkward\Tests;
 
-use Monkward\Actions\ActionTreeGenerator;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -127,8 +126,6 @@ final class HttpIntegrationTest extends TestCase
 
     private function startServer(?string $singleFile = null, array $extraEnv = []): void
     {
-        (new ActionTreeGenerator())->generate($this->workspace);
-
         do {
             $this->port = \random_int(20000, 45000);
         } while ($this->isPortOpen($this->port));
@@ -144,7 +141,6 @@ final class HttpIntegrationTest extends TestCase
         $env = \array_merge(\getenv(), [
             'MONKWARD_TARGET' => $this->target,
             'MONKWARD_SINGLE_FILE' => $singleFile ?? '',
-            'MONKWARD_ACTIONS' => $this->workspace . '/actions',
             'MONKWARD_THEME_CSS_PATH' => \dirname(__DIR__) . '/resources/themes/default.css',
         ], $extraEnv);
 

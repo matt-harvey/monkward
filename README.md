@@ -99,12 +99,14 @@ composer test
 
 ## How it works
 
-- The CLI (`bin/monkward`) resolves the target, config and theme, generates a
-  small routing tree, then spawns `php -S <host>:<port> -t <temp-docroot> <router>`.
+- The CLI (`bin/monkward`) resolves the target, config and theme, then spawns
+  `php -S <host>:<port> -t <temp-docroot> <router>`.
 - The HTTP layer is built on [`substancephp/http`](https://packagist.org/packages/substancephp/http)
-  (PSR-15 middleware, filepath routing, `HtmlRenderer` templates) and
+  (PSR-15 middleware, `HtmlRenderer` templates, exception handling) and
   [`substancephp/container`](https://packagist.org/packages/substancephp/container)
-  (PSR-11 dependency injection). Markdown is rendered by
+  (PSR-11 dependency injection). Routing is a small custom matcher/actor pair,
+  substituted via `MonkwardProvider` in place of the library's filepath-based
+  route middlewares. Markdown is rendered by
   [`league/commonmark`](https://packagist.org/packages/league/commonmark).
 - The PHAR is built with [`humbug/box`](https://packagist.org/packages/humbug/box);
   when the PHAR is executed by `php -S` its stub boots the HTTP router directly.
