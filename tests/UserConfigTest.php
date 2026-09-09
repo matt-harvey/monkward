@@ -37,6 +37,18 @@ TOML);
     }
 
     #[Test]
+    public function parsesIgnoreAndIncludeArrays(): void
+    {
+        $config = UserConfig::fromToml(<<<'TOML'
+ignore = ["build", "tmp"]
+include = ["vendor"]
+TOML);
+
+        self::assertSame(['build', 'tmp'], $config->ignore);
+        self::assertSame(['vendor'], $config->include);
+    }
+
+    #[Test]
     public function unknownKeysAreIgnored(): void
     {
         $config = UserConfig::fromToml("theme = \"solar\"\nverbosity = 3\n[section]\nfoo = \"bar\"\n");

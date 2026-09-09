@@ -6,6 +6,31 @@ namespace Monkward\Site;
 
 final class FileScanner
 {
+    /** Directory names ignored by default. Hidden directories are also skipped unless re-included. */
+    public const DEFAULT_IGNORE = ['.git', '.svn', '.hg', 'vendor', 'node_modules', 'bower_components'];
+
+    /** @var list<string> lowercase directory names that are ignored */
+    private array $ignoredDirs;
+
+    /** @var list<string> lowercase directory names explicitly re-included */
+    private array $includedDirs;
+
+    /**
+     * @param list<string> $ignore extra directory names to ignore, in addition to the defaults
+     * @param list<string> $include directory names to re-include even if default-ignored or hidden
+     */
+    public function __construct(array $ignore = [], array $include = [])
+    {
+        $this->ignoredDirs = \array_values(\array_diff(
+            \array_merge(
+                \array_map('strtolower', self::DEFAULT_IGNORE),
+                \array_map('strtolower', $ignore),
+            ),
+            \array_map('strtolower', $include),
+        ));
+        $this->includedDirs = \array_values(\array_map('strtolower', $include));
+    }
+
     /** @return list<string> relative slash-separated paths of all .md files under $root */
     public function scan(string $root): array
     {
@@ -21,7 +46,7 @@ final class FileScanner
                     $root,
                     \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_FILEINFO,
                 ),
-                static fn (\SplFileInfo $current): bool => self::accept($current),
+                fn (\SplFileInfo $current): bool => $this->accept($current),
             ),
             \RecursiveIteratorIterator::LEAVES_ONLY,
             \RecursiveIteratorIterator::CATCH_GET_CHILD,
@@ -44,14 +69,43 @@ final class FileScanner
         return $files;
     }
 
-    private static function accept(\SplFileInfo $current): bool
+    /** Whether a file path sits under an ignored directory (ignores the file name itself). */
+    public function isIgnored(string $relativePath): bool
+    {
+        $parts = \explode('/', \str_replace('\\', '/', $relativePath));
+        \array_pop($parts); // the last segment is the file name; ignore applies to directories
+
+        foreach ($parts as $part) {
+            if ($this->isDirIgnored($part)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function accept(\SplFileInfo $current): bool
     {
         $name = $current->getFilename();
 
-        if (\str_starts_with($name, '.')) {
-            return false;
+        if ($current->isDir()) {
+            return ! $this->isDirIgnored($name);
         }
 
-        return $current->isDir() || $current->isFile();
+        return $current->isFile() && ! \str_starts_with($name, '.');
+    }
+
+    private function isDirIgnored(string $name): bool
+    {
+        $lower = \strtolower($name);
+
+        if (\in_array($lower, $this->includedDirs, true)) {
+            return false;
+        }
+        if (\in_array($lower, $this->ignoredDirs, true)) {
+            return true;
+        }
+
+        return \str_starts_with($name, '.');
     }
 }

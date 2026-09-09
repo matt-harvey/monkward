@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Monkward\Http;
 
 use Monkward\Markdown\MarkdownRenderer;
+use Monkward\Site\FileScanner;
 use SubstancePHP\HTTP\Exception\BaseException\UserError;
 
 final class DocPage
@@ -13,6 +14,7 @@ final class DocPage
         private string $root,
         private ?string $singleFile,
         private MarkdownRenderer $markdown,
+        private FileScanner $scanner,
     ) {
     }
 
@@ -26,6 +28,10 @@ final class DocPage
         }
 
         if ($this->singleFile !== null && $relative !== \basename($this->singleFile)) {
+            UserError::throw(404);
+        }
+
+        if ($this->singleFile === null && $this->scanner->isIgnored($relative)) {
             UserError::throw(404);
         }
 

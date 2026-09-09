@@ -12,6 +12,10 @@ final readonly class UserConfig
         public ?string $theme = null,
         public ?int $port = null,
         public ?string $host = null,
+        /** @var list<string> */
+        public array $ignore = [],
+        /** @var list<string> */
+        public array $include = [],
     ) {
     }
 
@@ -50,7 +54,14 @@ final readonly class UserConfig
             $host = $values['host'];
         }
 
-        return new self($theme, $port, $host);
+        $ignore = isset($values['ignore']) && \is_string($values['ignore'])
+            ? self::parseStringList($values['ignore'])
+            : [];
+        $include = isset($values['include']) && \is_string($values['include'])
+            ? self::parseStringList($values['include'])
+            : [];
+
+        return new self($theme, $port, $host, $ignore, $include);
     }
 
     public static function configDir(): ?string
@@ -120,6 +131,10 @@ final readonly class UserConfig
             $end = \strrpos($value, "'");
             return $end === false || $end === 0 ? $value : \substr($value, 0, $end + 1);
         }
+        if (\str_starts_with($value, '[')) {
+            $end = \strrpos($value, ']');
+            return $end === false ? $value : \substr($value, 0, $end + 1);
+        }
         $stripped = \preg_replace('/\s+#.*$/', '', $value);
         return $stripped ?? $value;
     }
@@ -134,6 +149,29 @@ final readonly class UserConfig
             return \substr($value, 1, -1);
         }
         return $value;
+    }
+
+    /** @return list<string> */
+    private static function parseStringList(string $value): array
+    {
+        if (! \str_starts_with($value, '[')) {
+            return $value === '' ? [] : [self::unquote($value)];
+        }
+
+        $inner = \trim($value, '[]');
+        if ($inner === '') {
+            return [];
+        }
+
+        $items = [];
+        foreach (\explode(',', $inner) as $item) {
+            $item = self::unquote(\trim($item));
+            if ($item !== '') {
+                $items[] = $item;
+            }
+        }
+
+        return $items;
     }
 
     private static function parsePort(string $value): int

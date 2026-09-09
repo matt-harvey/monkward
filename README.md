@@ -44,12 +44,28 @@ monkward README.md           # serve a single markdown file
 monkward --theme=yeah        # use ~/.config/monkward/themes/yeah.css
 monkward --port=9000         # serve on a different port
 monkward --host=0.0.0.0      # bind a different host
+monkward --ignore=build      # also ignore a directory name (repeatable)
+monkward --include=vendor    # re-include a default-ignored directory
 monkward --no-browser        # don't open a browser
 monkward --help              # full help
 ```
 
 While the server runs, files are read on every request, so edits show up on
 refresh. Stop the server with `Ctrl+C`.
+
+## Ignored directories
+
+By default monkward skips `.git`, `.svn`, `.hg`, `vendor`, `node_modules`,
+`bower_components`, and any hidden directory. Ignored directories are neither
+listed nor served when addressed directly.
+
+Add more with `--ignore` (repeatable, or comma-separated) or the `ignore` key in
+`config.toml`. Re-include a default-ignored directory with `--include` or the
+`include` key:
+
+```bash
+monkward --ignore=build,tmp --include=vendor
+```
 
 ## Themes
 
@@ -67,6 +83,8 @@ Then run `monkward --theme=yeah`, or make it your default via
 theme = "yeah"
 port = 8800
 host = "127.0.0.1"
+ignore = ["build", "tmp"]
+include = ["vendor"]
 ```
 
 Command-line flags override the config file. Without any configuration,

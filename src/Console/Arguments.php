@@ -16,6 +16,10 @@ final readonly class Arguments
         public bool $help = false,
         public bool $version = false,
         public ?string $path = null,
+        /** @var list<string> */
+        public array $ignore = [],
+        /** @var list<string> */
+        public array $include = [],
     ) {
     }
 
@@ -28,6 +32,8 @@ final readonly class Arguments
         $help = false;
         $version = false;
         $path = null;
+        $ignore = [];
+        $include = [];
         $positionalOnly = false;
 
         $args = \array_slice($argv, 1);
@@ -91,6 +97,26 @@ final readonly class Arguments
                 continue;
             }
 
+            if (\str_starts_with($arg, '--ignore=')) {
+                self::appendList($ignore, \substr($arg, 9));
+                continue;
+            }
+            if ($arg === '--ignore') {
+                self::appendList($ignore, self::nextValue($args, $i));
+                $i++;
+                continue;
+            }
+
+            if (\str_starts_with($arg, '--include=')) {
+                self::appendList($include, \substr($arg, 10));
+                continue;
+            }
+            if ($arg === '--include') {
+                self::appendList($include, self::nextValue($args, $i));
+                $i++;
+                continue;
+            }
+
             if (\str_starts_with($arg, '-')) {
                 throw new MonkwardException("unknown option: $arg (try --help)");
             }
@@ -98,7 +124,17 @@ final readonly class Arguments
             self::setPath($arg, $path);
         }
 
-        return new self($theme, $port, $host, $noBrowser, $help, $version, $path);
+        return new self(
+            theme: $theme,
+            port: $port,
+            host: $host,
+            noBrowser: $noBrowser,
+            help: $help,
+            version: $version,
+            path: $path,
+            ignore: $ignore,
+            include: $include,
+        );
     }
 
     private static function setPath(string $value, ?string &$path): void
@@ -107,6 +143,17 @@ final readonly class Arguments
             throw new MonkwardException('expected at most one path argument');
         }
         $path = $value;
+    }
+
+    /** @param list<string> $list */
+    private static function appendList(array &$list, string $value): void
+    {
+        foreach (\explode(',', $value) as $item) {
+            $item = \trim($item);
+            if ($item !== '') {
+                $list[] = $item;
+            }
+        }
     }
 
     /** @param list<string> $args */

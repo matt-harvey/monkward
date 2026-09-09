@@ -45,6 +45,21 @@ final class ArgumentsTest extends TestCase
     }
 
     #[Test]
+    public function parsesIgnoreAndIncludeLists(): void
+    {
+        $args = Arguments::parse([
+            'monkward',
+            '--ignore=vendor',
+            '--ignore', 'build,tmp',
+            '--include=node_modules',
+            '--include', '.git',
+        ]);
+
+        self::assertSame(['vendor', 'build', 'tmp'], $args->ignore);
+        self::assertSame(['node_modules', '.git'], $args->include);
+    }
+
+    #[Test]
     public function rejectsUnknownOptions(): void
     {
         $this->expectException(MonkwardException::class);

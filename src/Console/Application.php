@@ -46,6 +46,8 @@ final class Application
             $themeName = $args->theme ?? $config->theme;
             $port = $args->port ?? $config->port ?? self::DEFAULT_PORT;
             $host = $args->host ?? $config->host ?? self::DEFAULT_HOST;
+            $ignore = \array_merge($config->ignore, $args->ignore);
+            $include = \array_merge($config->include, $args->include);
 
             $theme = (new ThemeManager())->resolve($themeName, strict: $args->theme !== null);
 
@@ -57,7 +59,7 @@ final class Application
             $this->registerSignalHandlers();
 
             $url = \sprintf('http://%s:%d', $host, $port);
-            $this->startServer($host, $port, $this->routerPath(), $target, $singleFile, $theme->path);
+            $this->startServer($host, $port, $this->routerPath(), $target, $singleFile, $theme->path, $ignore, $include);
 
             $this->stdout(\sprintf('monkward %s serving %s at %s', Version::VERSION, $target, $url));
             $this->stdout('Press Ctrl+C to stop.');
@@ -135,6 +137,8 @@ final class Application
         string $target,
         ?string $singleFile,
         string $themeCssPath,
+        array $ignore,
+        array $include,
     ): void {
         $command = [
             \PHP_BINARY,
@@ -150,6 +154,8 @@ final class Application
             'MONKWARD_SINGLE_FILE' => $singleFile ?? '',
             'MONKWARD_ACTIONS' => $this->workspace . '/actions',
             'MONKWARD_THEME_CSS_PATH' => $themeCssPath,
+            'MONKWARD_IGNORE' => \json_encode(\array_values($ignore), \JSON_THROW_ON_ERROR),
+            'MONKWARD_INCLUDE' => \json_encode(\array_values($include), \JSON_THROW_ON_ERROR),
         ]);
 
         $descriptors = [
@@ -403,15 +409,22 @@ Options:
   --theme=NAME             Use ~/.config/monkward/themes/NAME.css
   --port=PORT              Port to serve on (default: 8800)
   --host=HOST              Host to bind (default: 127.0.0.1)
+  --ignore=NAME            Also ignore this directory name (repeatable, comma-separated)
+  --include=NAME           Re-include a default-ignored directory (repeatable, comma-separated)
   --no-browser             Do not open the default browser
   -h, --help               Show this help
   -V, --version            Show the version
 
+Ignored by default: .git, .svn, .hg, vendor, node_modules, bower_components
+(plus any hidden directory). Re-include with --include, e.g. --include=vendor.
+
 Configuration:
-  ~/.config/monkward/config.toml may set theme, port and host, e.g.:
+  ~/.config/monkward/config.toml may set theme, port, host, ignore and include:
 
       theme = "yeah"
       port = 8800
+      ignore = ["build", "tmp"]
+      include = ["vendor"]
 
   Theme stylesheets live in ~/.config/monkward/themes/ (e.g. yeah.css).
 HELP);

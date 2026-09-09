@@ -28,6 +28,8 @@ final class HttpIntegrationTest extends TestCase
 
         \mkdir($this->target . '/docs/deep', 0777, true);
         \mkdir($this->target . '/empty', 0777, true);
+        \mkdir($this->target . '/vendor', 0777, true);
+        \mkdir($this->target . '/node_modules', 0777, true);
         \mkdir($this->workspace . '/docroot', 0777, true);
 
         \file_put_contents($this->target . '/hello.md', "# Hello\n\nworld");
@@ -35,6 +37,8 @@ final class HttpIntegrationTest extends TestCase
         \file_put_contents($this->target . '/docs/deep/nested.md', "# Nested\n\n> deep");
         \file_put_contents($this->target . '/docs/notes.txt', 'not markdown');
         \file_put_contents($this->target . '/empty/nothing.md.txt', 'nope');
+        \file_put_contents($this->target . '/vendor/bundle.md', '# Vendored');
+        \file_put_contents($this->target . '/node_modules/pkg.md', '# Packaged');
     }
 
     protected function tearDown(): void
@@ -57,6 +61,8 @@ final class HttpIntegrationTest extends TestCase
         self::assertStringContainsString('>guide</a>', $indexBody);
         self::assertStringNotContainsString('notes.txt', $indexBody);
         self::assertStringNotContainsString('empty', $indexBody);
+        self::assertStringNotContainsString('vendor', $indexBody);
+        self::assertStringNotContainsString('node_modules', $indexBody);
 
         [$docStatus, $docBody] = $this->get('/hello.md');
         self::assertSame(200, $docStatus);
@@ -79,11 +85,29 @@ final class HttpIntegrationTest extends TestCase
         [$missingStatus] = $this->get('/missing.md');
         self::assertSame(404, $missingStatus);
 
+        [$ignoredStatus] = $this->get('/vendor/bundle.md');
+        self::assertSame(404, $ignoredStatus);
+
         [$nonMdStatus] = $this->get('/docs/notes.txt');
         self::assertSame(404, $nonMdStatus);
 
         [$dirStatus] = $this->get('/docs/');
         self::assertSame(404, $dirStatus);
+    }
+
+    #[Test]
+    public function includeEnvReIncludesAnIgnoredDirectory(): void
+    {
+        $this->startServer(extraEnv: ['MONKWARD_INCLUDE' => '["vendor"]']);
+
+        [$indexStatus, $indexBody] = $this->get('/');
+        self::assertSame(200, $indexStatus);
+        self::assertStringContainsString('vendor/', $indexBody);
+        self::assertStringNotContainsString('node_modules', $indexBody);
+
+        [$docStatus, $docBody] = $this->get('/vendor/bundle.md');
+        self::assertSame(200, $docStatus);
+        self::assertStringContainsString('<h1>Vendored</h1>', $docBody);
     }
 
     #[Test]
@@ -101,7 +125,7 @@ final class HttpIntegrationTest extends TestCase
         self::assertSame(404, $otherStatus);
     }
 
-    private function startServer(?string $singleFile = null): void
+    private function startServer(?string $singleFile = null, array $extraEnv = []): void
     {
         (new ActionTreeGenerator())->generate($this->workspace);
 
@@ -122,7 +146,7 @@ final class HttpIntegrationTest extends TestCase
             'MONKWARD_SINGLE_FILE' => $singleFile ?? '',
             'MONKWARD_ACTIONS' => $this->workspace . '/actions',
             'MONKWARD_THEME_CSS_PATH' => \dirname(__DIR__) . '/resources/themes/default.css',
-        ]);
+        ], $extraEnv);
 
         $process = \proc_open($command, [
             0 => ['file', '/dev/null', 'r'],

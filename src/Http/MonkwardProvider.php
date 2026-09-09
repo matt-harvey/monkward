@@ -22,9 +22,15 @@ final class MonkwardProvider implements ProviderInterface
             'monkward.target' => static fn (): string => \getenv('MONKWARD_TARGET') ?: '',
             'monkward.single-file' => static fn (): ?string => \getenv('MONKWARD_SINGLE_FILE') ?: null,
             'monkward.theme-css-path' => static fn (): string => \getenv('MONKWARD_THEME_CSS_PATH') ?: '',
+            'monkward.ignore' => static fn (): array => self::decodeList(\getenv('MONKWARD_IGNORE')),
+            'monkward.include' => static fn (): array => self::decodeList(\getenv('MONKWARD_INCLUDE')),
 
             MarkdownRenderer::class => Container::autowire(...),
-            FileScanner::class => Container::autowire(...),
+
+            FileScanner::class => static fn (Container $c): FileScanner => new FileScanner(
+                ignore: $c->get('monkward.ignore'),
+                include: $c->get('monkward.include'),
+            ),
 
             SiteIndex::class => static fn (Container $c): SiteIndex => new SiteIndex(
                 root: $c->get('monkward.target'),
@@ -35,6 +41,7 @@ final class MonkwardProvider implements ProviderInterface
                 root: $c->get('monkward.target'),
                 singleFile: $c->get('monkward.single-file'),
                 markdown: $c->get(MarkdownRenderer::class),
+                scanner: $c->get(FileScanner::class),
             ),
 
             IndexPage::class => static fn (Container $c): IndexPage => new IndexPage(
@@ -56,5 +63,20 @@ final class MonkwardProvider implements ProviderInterface
                 ),
             ),
         ];
+    }
+
+    /** @return list<string> */
+    private static function decodeList(string|false $env): array
+    {
+        if ($env === false || $env === '') {
+            return [];
+        }
+
+        $decoded = \json_decode($env, true);
+        if (! \is_array($decoded)) {
+            return [];
+        }
+
+        return \array_values(\array_filter($decoded, 'is_string'));
     }
 }
