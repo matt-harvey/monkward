@@ -1,0 +1,6 @@
+/vendor/
+/build/
+/.reasonix/
+/.phpunit.cache/
+/.phpunit.result.cache
+.phpunit.result.cache

@@ -1,0 +1,18 @@
+{
+    "main": "bin/monkward",
+    "output": "build/monkward.phar",
+    "compression": "GZ",
+    "directories": [
+        "src",
+        "vendor",
+        "app",
+        "resources"
+    ],
+    "files": [
+        "bin/monkward",
+        "bin/server.php",
+        "LICENSE",
+        "composer.json"
+    ],
+    "stub": "box-stub.php"
+}

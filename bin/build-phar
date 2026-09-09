@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+STAGE="$(mktemp -d)"
+trap 'rm -rf "$STAGE"' EXIT
+
+# Copy the project into a clean staging dir (excluding vendor/build/git).
+(
+    cd "$PROJECT_ROOT"
+    tar \
+        --exclude='./vendor' \
+        --exclude='./build' \
+        --exclude='./.git' \
+        --exclude='./.phpunit.cache' \
+        -cf - .
+) | tar -xf - -C "$STAGE"
+
+# Drop dev requirements before resolving: humbug/box "replaces" several
+# symfony/polyfill packages that league/commonmark requires, which makes
+# Composer treat box as a production package and drag it into the PHAR.
+php -r '
+$file = $argv[1];
+$json = json_decode(file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+unset($json["require-dev"]);
+file_put_contents($file, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
+' "$STAGE/composer.json"
+
+rm -f "$STAGE/composer.lock"
+
+# Install production dependencies only, with an optimized autoloader.
+composer install --no-dev --no-interaction --optimize-autoloader --quiet --working-dir="$STAGE"
+
+# Build the PHAR using box from the developer checkout.
+php -d phar.readonly=0 "$PROJECT_ROOT/vendor/bin/box" compile -d "$STAGE" --no-interaction
+
+mkdir -p "$PROJECT_ROOT/build"
+cp "$STAGE/build/monkward.phar" "$PROJECT_ROOT/build/monkward.phar"
+echo "Built $PROJECT_ROOT/build/monkward.phar"

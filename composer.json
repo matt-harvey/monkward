@@ -1,0 +1,33 @@
+{
+    "name": "monkward/monkward",
+    "description": "An on-the-fly Markdown viewer served over localhost, installable as a PHAR.",
+    "type": "project",
+    "license": "MIT",
+    "keywords": ["markdown", "viewer", "cli", "phar", "server"],
+    "require": {
+        "php": ">=8.5",
+        "league/commonmark": "^2.6",
+        "substancephp/container": "^0.6.2",
+        "substancephp/http": "^0.7.1"
+    },
+    "require-dev": {
+        "humbug/box": "^4.7",
+        "phpunit/phpunit": "^12.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Monkward\\": "src/"
+        }
+    },
+    "bin": [
+        "bin/monkward"
+    ],
+    "scripts": {
+        "test": "phpunit",
+        "build:phar": "bin/build-phar",
+        "box": "@build:phar"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
