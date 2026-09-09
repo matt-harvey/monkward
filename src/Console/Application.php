@@ -68,7 +68,8 @@ final class Application
             $this->stdout(\sprintf('monkward %s serving %s at %s', Version::VERSION, $target, $url));
             $this->stdout('Press Ctrl+C to stop.');
 
-            if (! $args->noBrowser) {
+            if ($args->open) {
+                $this->stdout(\sprintf('Opening %s in your default browser', $url));
                 $this->openBrowser($url);
             }
 
@@ -433,8 +434,8 @@ Options:
   --port=PORT              Port to serve on (default: 8800)
   --host=HOST              Host to bind (default: 127.0.0.1)
   --ignore=NAME            Also ignore this directory name for this run (repeatable)
+  --open                   Open the default browser at the served URL
   --init                   Create ~/.config/monkward with config.toml and themes/default.css
-  --no-browser             Do not open the default browser
   -h, --help               Show this help
   -V, --version            Show the version
 

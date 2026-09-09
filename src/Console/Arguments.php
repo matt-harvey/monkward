@@ -12,7 +12,7 @@ final readonly class Arguments
         public ?string $theme = null,
         public ?int $port = null,
         public ?string $host = null,
-        public bool $noBrowser = false,
+        public bool $open = false,
         public bool $help = false,
         public bool $version = false,
         public bool $init = false,
@@ -27,7 +27,7 @@ final readonly class Arguments
         $theme = null;
         $port = null;
         $host = null;
-        $noBrowser = false;
+        $open = false;
         $help = false;
         $version = false;
         $init = false;
@@ -66,8 +66,8 @@ final readonly class Arguments
                 continue;
             }
 
-            if ($arg === '--no-browser') {
-                $noBrowser = true;
+            if ($arg === '--open') {
+                $open = true;
                 continue;
             }
 
@@ -122,7 +122,7 @@ final readonly class Arguments
             theme: $theme,
             port: $port,
             host: $host,
-            noBrowser: $noBrowser,
+            open: $open,
             help: $help,
             version: $version,
             init: $init,

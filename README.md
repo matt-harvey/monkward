@@ -7,21 +7,15 @@ styled HTML. Directories with no markdown are never shown.
 
 ## Quick start
 
-Prereqs:
+## Prereqs
 * PHP 8.5+
 * `composer`.
 
-Install:
+## Install
 
 ```bash
 git clone <this-repo> && cd <this-repo>
 make install
-```
-
-Run:
-
-```
-monkward
 ```
 
 `make install` builds a PHAR and drops it in `~/.local/bin`
@@ -31,17 +25,25 @@ monkward
 
 ## Usage
 
+Starts the monkward server in your current directory, serving to `localhost:8080`:
+
+```
+monkward
+```
+
+Options:
+
 ```bash
 monkward                     # serve the current directory
 monkward docs/               # serve docs/ recursively
 monkward README.md           # serve a single markdown file
+monkward --open              # also open the default browser at the URL
 
 monkward --theme=yeah        # use ~/.config/monkward/themes/yeah.css
 monkward --port=9000         # serve on a different port
 monkward --host=0.0.0.0      # bind a different host
 monkward --ignore=build      # also ignore a directory name for this run
 monkward --init              # (re)create ~/.config/monkward with the defaults
-monkward --no-browser        # don't open a browser
 monkward --help              # full help
 ```
 
