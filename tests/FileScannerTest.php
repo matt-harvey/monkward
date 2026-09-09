@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Monkward\Tests;
 
+use Monkward\Config\UserConfig;
 use Monkward\Site\FileScanner;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -38,9 +39,9 @@ final class FileScannerTest extends TestCase
     }
 
     #[Test]
-    public function findsMarkdownRecursivelyAndPrunesIrrelevantDirs(): void
+    public function prebakedIgnoreListSkipsTheUsualSuspects(): void
     {
-        $files = (new FileScanner())->scan($this->root);
+        $files = (new FileScanner(UserConfig::DEFAULT_IGNORE))->scan($this->root);
 
         self::assertSame([
             'docs/deep/a.md',
@@ -51,36 +52,46 @@ final class FileScannerTest extends TestCase
     }
 
     #[Test]
-    public function includeReIncludesADefaultIgnoredDirectory(): void
+    public function emptyIgnoreListShowsEverythingMarkdown(): void
     {
-        $files = (new FileScanner(include: ['vendor']))->scan($this->root);
+        $files = (new FileScanner([]))->scan($this->root);
+
+        self::assertContains('vendor/bundle.md', $files);
+        self::assertContains('node_modules/pkg.md', $files);
+        self::assertContains('.git/config.md', $files);
+        self::assertNotContains('.hidden.md', $files); // dot-files are still skipped
+    }
+
+    #[Test]
+    public function editingTheListIsStraightforward(): void
+    {
+        $ignore = \array_values(\array_diff(UserConfig::DEFAULT_IGNORE, ['vendor']));
+
+        $files = (new FileScanner($ignore))->scan($this->root);
 
         self::assertContains('vendor/bundle.md', $files);
         self::assertNotContains('node_modules/pkg.md', $files);
     }
 
     #[Test]
-    public function extraIgnoreSkipsAnAdditionalDirectory(): void
+    public function extraIgnoreNamesAreCaseInsensitive(): void
     {
-        \mkdir($this->root . '/build', 0777, true);
-        \file_put_contents($this->root . '/build/notes.md', '# notes');
+        \mkdir($this->root . '/Build', 0777, true);
+        \file_put_contents($this->root . '/Build/notes.md', '# notes');
 
-        $default = (new FileScanner())->scan($this->root);
-        self::assertContains('build/notes.md', $default);
+        $files = (new FileScanner([...UserConfig::DEFAULT_IGNORE, 'build']))->scan($this->root);
 
-        $ignored = (new FileScanner(ignore: ['build']))->scan($this->root);
-        self::assertNotContains('build/notes.md', $ignored);
+        self::assertNotContains('Build/notes.md', $files);
     }
 
     #[Test]
     public function isIgnoredMatchesDirectorySegments(): void
     {
-        $scanner = new FileScanner();
+        $scanner = new FileScanner(UserConfig::DEFAULT_IGNORE);
 
         self::assertTrue($scanner->isIgnored('vendor/bundle.md'));
         self::assertTrue($scanner->isIgnored('a/node_modules/b.md'));
         self::assertFalse($scanner->isIgnored('docs/guide.md'));
-        self::assertFalse((new FileScanner(include: ['vendor']))->isIgnored('vendor/bundle.md'));
     }
 
     private function removeTree(string $dir): void

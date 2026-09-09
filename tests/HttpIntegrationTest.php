@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Monkward\Tests;
 
+use Monkward\Config\UserConfig;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -95,9 +96,10 @@ final class HttpIntegrationTest extends TestCase
     }
 
     #[Test]
-    public function includeEnvReIncludesAnIgnoredDirectory(): void
+    public function ignoreEnvControlsTheIgnoreList(): void
     {
-        $this->startServer(extraEnv: ['MONKWARD_INCLUDE' => '["vendor"]']);
+        $withoutVendor = \array_values(\array_diff(UserConfig::DEFAULT_IGNORE, ['vendor']));
+        $this->startServer(extraEnv: ['MONKWARD_IGNORE' => \json_encode($withoutVendor)]);
 
         [$indexStatus, $indexBody] = $this->get('/');
         self::assertSame(200, $indexStatus);
@@ -142,6 +144,7 @@ final class HttpIntegrationTest extends TestCase
             'MONKWARD_TARGET' => $this->target,
             'MONKWARD_SINGLE_FILE' => $singleFile ?? '',
             'MONKWARD_THEME_CSS_PATH' => \dirname(__DIR__) . '/resources/themes/default.css',
+            'MONKWARD_IGNORE' => \json_encode(UserConfig::DEFAULT_IGNORE),
         ], $extraEnv);
 
         $process = \proc_open($command, [

@@ -34,6 +34,7 @@ install: build
 	@install -m 0755 "$(PHAR)" "$(BINDIR)/monkward"
 	@echo "Installed: $(BINDIR)/monkward"
 	@$(PHP) "$(BINDIR)/monkward" --version
+	@$(PHP) "$(BINDIR)/monkward" --init
 	@case ":$${PATH}:" in \
 		*":$(BINDIR):"*) echo "Ready — run: monkward";; \
 		*) echo "Note: $(BINDIR) is not on your PATH";; \

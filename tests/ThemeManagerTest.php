@@ -36,6 +36,18 @@ final class ThemeManagerTest extends TestCase
     }
 
     #[Test]
+    public function defaultThemePrefersTheInstalledUserCopy(): void
+    {
+        $userDefault = $this->configHome . '/monkward/themes/default.css';
+        \file_put_contents($userDefault, 'body { background: hotpink; }');
+
+        $theme = (new ThemeManager())->resolve('default', false);
+
+        self::assertSame($userDefault, $theme->path);
+        self::assertStringContainsString('hotpink', (string) \file_get_contents($theme->path));
+    }
+
+    #[Test]
     public function resolvesUserTheme(): void
     {
         \file_put_contents($this->configHome . '/monkward/themes/yeah.css', 'body { color: red; }');

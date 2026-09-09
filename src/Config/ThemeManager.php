@@ -10,10 +10,10 @@ final class ThemeManager
 {
     public function resolve(?string $name, bool $strict): Theme
     {
-        $default = new Theme('default', $this->projectRoot() . '/resources/themes/default.css');
+        $name ??= UserConfig::DEFAULT_THEME;
 
-        if ($name === null || $name === '' || $name === 'default') {
-            return $default;
+        if ($name === '' || $name === UserConfig::DEFAULT_THEME) {
+            return $this->resolveDefault();
         }
 
         if (! \preg_match('/^[A-Za-z0-9._-]+$/', $name)) {
@@ -31,12 +31,23 @@ final class ThemeManager
         }
 
         $this->warn("theme '{$name}' not found; falling back to the default theme");
-        return $default;
+        return $this->resolveDefault();
     }
 
-    private function projectRoot(): string
+    public static function builtInDefaultThemePath(): string
     {
-        return \dirname(__DIR__, 2);
+        return \dirname(__DIR__, 2) . '/resources/themes/default.css';
+    }
+
+    private function resolveDefault(): Theme
+    {
+        $userTheme = UserConfig::themesDir() . '/' . UserConfig::DEFAULT_THEME . '.css';
+
+        if (\is_file($userTheme)) {
+            return new Theme(UserConfig::DEFAULT_THEME, $userTheme);
+        }
+
+        return new Theme(UserConfig::DEFAULT_THEME, self::builtInDefaultThemePath());
     }
 
     private function warn(string $message): void

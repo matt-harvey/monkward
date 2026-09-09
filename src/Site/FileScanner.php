@@ -6,29 +6,13 @@ namespace Monkward\Site;
 
 final class FileScanner
 {
-    /** Directory names ignored by default. Hidden directories are also skipped unless re-included. */
-    public const DEFAULT_IGNORE = ['.git', '.svn', '.hg', 'vendor', 'node_modules', 'bower_components'];
-
     /** @var list<string> lowercase directory names that are ignored */
     private array $ignoredDirs;
 
-    /** @var list<string> lowercase directory names explicitly re-included */
-    private array $includedDirs;
-
-    /**
-     * @param list<string> $ignore extra directory names to ignore, in addition to the defaults
-     * @param list<string> $include directory names to re-include even if default-ignored or hidden
-     */
-    public function __construct(array $ignore = [], array $include = [])
+    /** @param list<string> $ignore directory names to ignore (case-insensitive) */
+    public function __construct(array $ignore = [])
     {
-        $this->ignoredDirs = \array_values(\array_diff(
-            \array_merge(
-                \array_map('strtolower', self::DEFAULT_IGNORE),
-                \array_map('strtolower', $ignore),
-            ),
-            \array_map('strtolower', $include),
-        ));
-        $this->includedDirs = \array_values(\array_map('strtolower', $include));
+        $this->ignoredDirs = \array_values(\array_map('strtolower', $ignore));
     }
 
     /** @return list<string> relative slash-separated paths of all .md files under $root */
@@ -76,7 +60,7 @@ final class FileScanner
         \array_pop($parts); // the last segment is the file name; ignore applies to directories
 
         foreach ($parts as $part) {
-            if ($this->isDirIgnored($part)) {
+            if (\in_array(\strtolower($part), $this->ignoredDirs, true)) {
                 return true;
             }
         }
@@ -89,23 +73,9 @@ final class FileScanner
         $name = $current->getFilename();
 
         if ($current->isDir()) {
-            return ! $this->isDirIgnored($name);
+            return ! \in_array(\strtolower($name), $this->ignoredDirs, true);
         }
 
         return $current->isFile() && ! \str_starts_with($name, '.');
-    }
-
-    private function isDirIgnored(string $name): bool
-    {
-        $lower = \strtolower($name);
-
-        if (\in_array($lower, $this->includedDirs, true)) {
-            return false;
-        }
-        if (\in_array($lower, $this->ignoredDirs, true)) {
-            return true;
-        }
-
-        return \str_starts_with($name, '.');
     }
 }

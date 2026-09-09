@@ -27,13 +27,11 @@ final class MonkwardProvider implements ProviderInterface
             'monkward.single-file' => static fn (): ?string => \getenv('MONKWARD_SINGLE_FILE') ?: null,
             'monkward.theme-css-path' => static fn (): string => \getenv('MONKWARD_THEME_CSS_PATH') ?: '',
             'monkward.ignore' => static fn (): array => self::decodeList(\getenv('MONKWARD_IGNORE')),
-            'monkward.include' => static fn (): array => self::decodeList(\getenv('MONKWARD_INCLUDE')),
 
             MarkdownRenderer::class => Container::autowire(...),
 
             FileScanner::class => static fn (Container $c): FileScanner => new FileScanner(
                 ignore: $c->get('monkward.ignore'),
-                include: $c->get('monkward.include'),
             ),
 
             SiteIndex::class => static fn (Container $c): SiteIndex => new SiteIndex(

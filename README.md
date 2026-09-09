@@ -1,7 +1,7 @@
 # monkward
 
-An on-the-fly Markdown viewer for your current directory. Run `monkward`, it
-starts a local server (PHP's built-in `php -S`), opens your browser at
+An on-the-fly Markdown viewer for your current directory. Run `monkward`; it
+starts a local server, opens your browser at
 `http://localhost:8800`, and renders every `.md` file in that directory tree as
 styled HTML. Directories with no markdown are never shown.
 
@@ -26,15 +26,8 @@ monkward
 
 `make install` builds a PHAR and drops it in `~/.local/bin`
 (override with `make install PREFIX=/somewhere`), so `monkward` is on your
-`PATH` immediately. Requires PHP 8.5+, Composer, and `make`.
-
-No `make`? Build the PHAR by hand and put it anywhere on your `PATH`:
-
-```bash
-composer install
-composer build:phar
-cp build/monkward.phar ~/.local/bin/monkward
-```
+`PATH` immediately. It also initializes `~/.config/monkward/` with an editable
+`config.toml` and `themes/default.css`.
 
 ## Usage
 
@@ -46,8 +39,8 @@ monkward README.md           # serve a single markdown file
 monkward --theme=yeah        # use ~/.config/monkward/themes/yeah.css
 monkward --port=9000         # serve on a different port
 monkward --host=0.0.0.0      # bind a different host
-monkward --ignore=build      # also ignore a directory name (repeatable)
-monkward --include=vendor    # re-include a default-ignored directory
+monkward --ignore=build      # also ignore a directory name for this run
+monkward --init              # (re)create ~/.config/monkward with the defaults
 monkward --no-browser        # don't open a browser
 monkward --help              # full help
 ```
@@ -57,36 +50,37 @@ server with `Ctrl+C`.
 
 ## Themes and configuration
 
-Drop stylesheets in `~/.config/monkward/themes/`:
+Installing monkward sets up `~/.config/monkward/` for you:
 
 ```
-~/.config/monkward/themes/
-└── yeah.css
+~/.config/monkward/
+├── config.toml
+└── themes/
+    └── default.css
 ```
 
-Use one with `--theme=yeah`, or make it your default in
-`~/.config/monkward/config.toml`:
+`config.toml` starts with the prebaked defaults. You can edit it freely:
 
 ```toml
-theme = "yeah"
+theme = "default"
 port = 8800
 host = "127.0.0.1"
-ignore = ["build", "tmp"]
-include = ["vendor"]
+ignore = [".git", ".svn", ".hg", ".idea", ".vscode", "vendor", "node_modules", "bower_components"]
 ```
 
-Command-line flags override the config file. With no configuration at all,
-monkward ships with its own default theme (light and dark variants).
+`themes/default.css` is the default theme, copied there so you can see and
+tweak it. Add your own stylesheets next to it (`yeah.css`, etc.) and point
+`theme` at one; or pass `--theme=yeah` for a single run. Command-line flags
+override the config file.
 
 ## Ignored directories
 
-By default monkward skips `.git`, `.svn`, `.hg`, `vendor`, `node_modules`,
-`bower_components`, and any hidden directory. Ignored directories are neither
-listed nor served when addressed directly. Add more with `--ignore`
-(repeatable or comma-separated); re-include one with `--include`:
+The `ignore` key in `config.toml` is the full list of directory names monkward
+skips. You can edit this list as you see fit. For a one-off directory ignoring, you can pass
+`--ignore=other_dir` to additionally ignore `other_dir` for that run.
 
 ```bash
-monkward --ignore=build,tmp --include=vendor
+monkward --ignore=build,tmp
 ```
 
 ## Development

@@ -8,14 +8,28 @@ use Monkward\MonkwardException;
 
 final readonly class UserConfig
 {
+    public const DEFAULT_THEME = 'default';
+    public const DEFAULT_PORT = 8800;
+    public const DEFAULT_HOST = '127.0.0.1';
+
+    /** The prebaked ignore list, also written to new config.toml files. */
+    public const DEFAULT_IGNORE = [
+        '.git',
+        '.svn',
+        '.hg',
+        '.idea',
+        '.vscode',
+        'vendor',
+        'node_modules',
+        'bower_components',
+    ];
+
     public function __construct(
         public ?string $theme = null,
         public ?int $port = null,
         public ?string $host = null,
         /** @var list<string> */
-        public array $ignore = [],
-        /** @var list<string> */
-        public array $include = [],
+        public array $ignore = self::DEFAULT_IGNORE,
     ) {
     }
 
@@ -24,12 +38,12 @@ final readonly class UserConfig
         $configDir = self::configDir();
         $file = $configDir === null ? null : "{$configDir}/config.toml";
         if ($file === null || ! \is_file($file)) {
-            return new self();
+            return new self(ignore: self::DEFAULT_IGNORE);
         }
 
         $contents = @\file_get_contents($file);
         if ($contents === false) {
-            return new self();
+            return new self(ignore: self::DEFAULT_IGNORE);
         }
 
         return self::fromToml($contents);
@@ -56,12 +70,9 @@ final readonly class UserConfig
 
         $ignore = isset($values['ignore']) && \is_string($values['ignore'])
             ? self::parseStringList($values['ignore'])
-            : [];
-        $include = isset($values['include']) && \is_string($values['include'])
-            ? self::parseStringList($values['include'])
-            : [];
+            : self::DEFAULT_IGNORE;
 
-        return new self($theme, $port, $host, $ignore, $include);
+        return new self($theme, $port, $host, $ignore);
     }
 
     public static function configDir(): ?string
@@ -88,7 +99,8 @@ final readonly class UserConfig
 
     /**
      * Parses the small TOML subset monkward understands: top-level `key = "value"` /
-     * `key = 'value'` / `key = 123` lines, with `#` comments. Everything else is ignored.
+     * `key = 'value'` / `key = 123` / `key = ["a", "b"]` lines, with `#` comments.
+     * Everything else is ignored.
      *
      * @return array<string, string>
      */

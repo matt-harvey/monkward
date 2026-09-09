@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Monkward\Console;
 
+use Monkward\Config\ConfigInstaller;
 use Monkward\Config\Theme;
 use Monkward\Config\ThemeManager;
 use Monkward\Config\UserConfig;
@@ -12,9 +13,6 @@ use Monkward\Version;
 
 final class Application
 {
-    private const DEFAULT_HOST = '127.0.0.1';
-    private const DEFAULT_PORT = 8800;
-
     private string $workspace = '';
 
     /** @var resource|null */
@@ -40,13 +38,21 @@ final class Application
                 return 0;
             }
 
+            if ($args->init) {
+                return $this->initConfig();
+            }
+
+            $created = (new ConfigInstaller())->ensureInstalled();
+            if ($created !== []) {
+                $this->stdout('Initialized monkward configuration in ' . UserConfig::configDir());
+            }
+
             $config = UserConfig::load();
 
             $themeName = $args->theme ?? $config->theme;
-            $port = $args->port ?? $config->port ?? self::DEFAULT_PORT;
-            $host = $args->host ?? $config->host ?? self::DEFAULT_HOST;
+            $port = $args->port ?? $config->port ?? UserConfig::DEFAULT_PORT;
+            $host = $args->host ?? $config->host ?? UserConfig::DEFAULT_HOST;
             $ignore = \array_merge($config->ignore, $args->ignore);
-            $include = \array_merge($config->include, $args->include);
 
             $theme = (new ThemeManager())->resolve($themeName, strict: $args->theme !== null);
 
@@ -57,7 +63,7 @@ final class Application
             $this->registerSignalHandlers();
 
             $url = \sprintf('http://%s:%d', $host, $port);
-            $this->startServer($host, $port, $this->routerPath(), $target, $singleFile, $theme->path, $ignore, $include);
+            $this->startServer($host, $port, $this->routerPath(), $target, $singleFile, $theme->path, $ignore);
 
             $this->stdout(\sprintf('monkward %s serving %s at %s', Version::VERSION, $target, $url));
             $this->stdout('Press Ctrl+C to stop.');
@@ -76,6 +82,28 @@ final class Application
             $this->stderr('monkward: ' . $e->getMessage());
             return 1;
         }
+    }
+
+    private function initConfig(): int
+    {
+        if (UserConfig::configDir() === null) {
+            $this->stderr('monkward: could not determine config directory (is HOME set?)');
+            return 1;
+        }
+
+        $created = (new ConfigInstaller())->ensureInstalled();
+
+        if ($created === []) {
+            $this->stdout('monkward configuration already set up in ' . UserConfig::configDir());
+            return 0;
+        }
+
+        $this->stdout('Initialized monkward configuration:');
+        foreach ($created as $path) {
+            $this->stdout('  created ' . $path);
+        }
+
+        return 0;
     }
 
     /** @return array{string, ?string} */
@@ -136,7 +164,6 @@ final class Application
         ?string $singleFile,
         string $themeCssPath,
         array $ignore,
-        array $include,
     ): void {
         $command = [
             \PHP_BINARY,
@@ -152,7 +179,6 @@ final class Application
             'MONKWARD_SINGLE_FILE' => $singleFile ?? '',
             'MONKWARD_THEME_CSS_PATH' => $themeCssPath,
             'MONKWARD_IGNORE' => \json_encode(\array_values($ignore), \JSON_THROW_ON_ERROR),
-            'MONKWARD_INCLUDE' => \json_encode(\array_values($include), \JSON_THROW_ON_ERROR),
         ]);
 
         $descriptors = [
@@ -406,24 +432,19 @@ Options:
   --theme=NAME             Use ~/.config/monkward/themes/NAME.css
   --port=PORT              Port to serve on (default: 8800)
   --host=HOST              Host to bind (default: 127.0.0.1)
-  --ignore=NAME            Also ignore this directory name (repeatable, comma-separated)
-  --include=NAME           Re-include a default-ignored directory (repeatable, comma-separated)
+  --ignore=NAME            Also ignore this directory name for this run (repeatable)
+  --init                   Create ~/.config/monkward with config.toml and themes/default.css
   --no-browser             Do not open the default browser
   -h, --help               Show this help
   -V, --version            Show the version
 
-Ignored by default: .git, .svn, .hg, vendor, node_modules, bower_components
-(plus any hidden directory). Re-include with --include, e.g. --include=vendor.
+Configuration lives in ~/.config/monkward/config.toml (created on install or
+first run). The `ignore` key is the full list of directory names to skip, e.g.:
 
-Configuration:
-  ~/.config/monkward/config.toml may set theme, port, host, ignore and include:
+      ignore = [".git", "vendor", "node_modules"]
 
-      theme = "yeah"
-      port = 8800
-      ignore = ["build", "tmp"]
-      include = ["vendor"]
-
-  Theme stylesheets live in ~/.config/monkward/themes/ (e.g. yeah.css).
+Theme stylesheets live in ~/.config/monkward/themes/ (e.g. yeah.css); the
+default theme is copied there as default.css so it can be edited.
 HELP);
     }
 

@@ -45,18 +45,22 @@ final class ArgumentsTest extends TestCase
     }
 
     #[Test]
-    public function parsesIgnoreAndIncludeLists(): void
+    public function parsesIgnoreList(): void
     {
         $args = Arguments::parse([
             'monkward',
             '--ignore=vendor',
             '--ignore', 'build,tmp',
-            '--include=node_modules',
-            '--include', '.git',
         ]);
 
         self::assertSame(['vendor', 'build', 'tmp'], $args->ignore);
-        self::assertSame(['node_modules', '.git'], $args->include);
+    }
+
+    #[Test]
+    public function parsesInitFlag(): void
+    {
+        self::assertTrue(Arguments::parse(['monkward', '--init'])->init);
+        self::assertFalse(Arguments::parse(['monkward'])->init);
     }
 
     #[Test]

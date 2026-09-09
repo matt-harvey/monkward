@@ -15,11 +15,10 @@ final readonly class Arguments
         public bool $noBrowser = false,
         public bool $help = false,
         public bool $version = false,
+        public bool $init = false,
         public ?string $path = null,
         /** @var list<string> */
         public array $ignore = [],
-        /** @var list<string> */
-        public array $include = [],
     ) {
     }
 
@@ -31,9 +30,9 @@ final readonly class Arguments
         $noBrowser = false;
         $help = false;
         $version = false;
+        $init = false;
         $path = null;
         $ignore = [];
-        $include = [];
         $positionalOnly = false;
 
         $args = \array_slice($argv, 1);
@@ -59,6 +58,11 @@ final readonly class Arguments
 
             if ($arg === '-V' || $arg === '--version') {
                 $version = true;
+                continue;
+            }
+
+            if ($arg === '--init') {
+                $init = true;
                 continue;
             }
 
@@ -107,16 +111,6 @@ final readonly class Arguments
                 continue;
             }
 
-            if (\str_starts_with($arg, '--include=')) {
-                self::appendList($include, \substr($arg, 10));
-                continue;
-            }
-            if ($arg === '--include') {
-                self::appendList($include, self::nextValue($args, $i));
-                $i++;
-                continue;
-            }
-
             if (\str_starts_with($arg, '-')) {
                 throw new MonkwardException("unknown option: $arg (try --help)");
             }
@@ -131,9 +125,9 @@ final readonly class Arguments
             noBrowser: $noBrowser,
             help: $help,
             version: $version,
+            init: $init,
             path: $path,
             ignore: $ignore,
-            include: $include,
         );
     }
 

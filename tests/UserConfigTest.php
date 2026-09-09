@@ -37,15 +37,29 @@ TOML);
     }
 
     #[Test]
-    public function parsesIgnoreAndIncludeArrays(): void
+    public function parsesIgnoreArray(): void
     {
         $config = UserConfig::fromToml(<<<'TOML'
 ignore = ["build", "tmp"]
-include = ["vendor"]
 TOML);
 
         self::assertSame(['build', 'tmp'], $config->ignore);
-        self::assertSame(['vendor'], $config->include);
+    }
+
+    #[Test]
+    public function missingIgnoreKeyFallsBackToPrebakedList(): void
+    {
+        $config = UserConfig::fromToml('theme = "solar"');
+
+        self::assertSame(UserConfig::DEFAULT_IGNORE, $config->ignore);
+    }
+
+    #[Test]
+    public function explicitEmptyIgnoreListIsRespected(): void
+    {
+        $config = UserConfig::fromToml('ignore = []');
+
+        self::assertSame([], $config->ignore);
     }
 
     #[Test]
