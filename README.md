@@ -73,6 +73,7 @@ Installing monkward sets up `~/.config/monkward/` for you:
 theme = "default"
 port = 8800
 host = "127.0.0.1"
+heading_ids = true
 ignore = [".git", ".svn", ".hg", ".idea", ".vscode", "vendor", "node_modules", "bower_components"]
 ```
 
@@ -80,6 +81,9 @@ ignore = [".git", ".svn", ".hg", ".idea", ".vscode", "vendor", "node_modules", "
 tweak it. Add your own stylesheets next to it (`yeah.css`, etc.) and point
 `theme` at one; or pass `--theme=yeah` for a single run. Command-line flags
 override the config file.
+
+`heading_ids = true` adds `id="..."` attributes to rendered headings so
+`[links](#anchors)` work. Set it to `false` to leave headings untouched.
 
 ## Ignored directories
 

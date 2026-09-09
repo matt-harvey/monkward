@@ -67,6 +67,10 @@ theme = "default"
 port = 8800
 host = "127.0.0.1"
 
+# Add id="..." attributes to rendered headings so [links](#anchors) work.
+# Set to false to leave headings exactly as written.
+heading_ids = true
+
 # Directory names to skip when scanning for markdown files.
 # Matched case-insensitively; edit the list freely.
 ignore = {$ignore}

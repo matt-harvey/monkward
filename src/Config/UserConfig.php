@@ -30,6 +30,7 @@ final readonly class UserConfig
         public ?string $host = null,
         /** @var list<string> */
         public array $ignore = self::DEFAULT_IGNORE,
+        public bool $headingIds = true,
     ) {
     }
 
@@ -72,7 +73,12 @@ final readonly class UserConfig
             ? self::parseStringList($values['ignore'])
             : self::DEFAULT_IGNORE;
 
-        return new self($theme, $port, $host, $ignore);
+        $headingIds = true;
+        if (isset($values['heading_ids']) && \is_string($values['heading_ids'])) {
+            $headingIds = self::parseBool($values['heading_ids']);
+        }
+
+        return new self($theme, $port, $host, $ignore, $headingIds);
     }
 
     public static function configDir(): ?string
@@ -196,5 +202,14 @@ final readonly class UserConfig
             throw new MonkwardException('port in config.toml must be between 1 and 65535');
         }
         return $port;
+    }
+
+    private static function parseBool(string $value): bool
+    {
+        return match (\strtolower(\trim($value))) {
+            'true', '1', 'yes', 'on' => true,
+            'false', '0', 'no', 'off' => false,
+            default => throw new MonkwardException("invalid boolean in config.toml: {$value}"),
+        };
     }
 }

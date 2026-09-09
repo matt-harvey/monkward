@@ -27,8 +27,11 @@ final class MonkwardProvider implements ProviderInterface
             'monkward.single-file' => static fn (): ?string => \getenv('MONKWARD_SINGLE_FILE') ?: null,
             'monkward.theme-css-path' => static fn (): string => \getenv('MONKWARD_THEME_CSS_PATH') ?: '',
             'monkward.ignore' => static fn (): array => self::decodeList(\getenv('MONKWARD_IGNORE')),
+            'monkward.heading-ids' => static fn (): bool => self::decodeBool(\getenv('MONKWARD_HEADING_IDS'), true),
 
-            MarkdownRenderer::class => Container::autowire(...),
+            MarkdownRenderer::class => static fn (Container $c): MarkdownRenderer => new MarkdownRenderer(
+                headingIds: $c->get('monkward.heading-ids'),
+            ),
 
             FileScanner::class => static fn (Container $c): FileScanner => new FileScanner(
                 ignore: $c->get('monkward.ignore'),
@@ -91,5 +94,14 @@ final class MonkwardProvider implements ProviderInterface
         }
 
         return \array_values(\array_filter($decoded, 'is_string'));
+    }
+
+    private static function decodeBool(string|false $env, bool $default): bool
+    {
+        if ($env === false || $env === '') {
+            return $default;
+        }
+
+        return $env === '1' || $env === 'true' || $env === 'yes';
     }
 }

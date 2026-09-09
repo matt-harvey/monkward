@@ -66,12 +66,12 @@ final class HttpIntegrationTest extends TestCase
 
         [$docStatus, $docBody] = $this->get('/hello.md');
         self::assertSame(200, $docStatus);
-        self::assertStringContainsString('<h1>Hello</h1>', $docBody);
+        self::assertStringContainsString('<h1 id="hello">Hello</h1>', $docBody);
         self::assertStringContainsString('<p>world</p>', $docBody);
 
         [$nestedStatus, $nestedBody] = $this->get('/docs/deep/nested.md');
         self::assertSame(200, $nestedStatus);
-        self::assertStringContainsString('<h1>Nested</h1>', $nestedBody);
+        self::assertStringContainsString('<h1 id="nested">Nested</h1>', $nestedBody);
         self::assertStringContainsString('<blockquote>', $nestedBody);
 
         [$cssStatus, $cssBody] = $this->get('/monkward-theme.css');
@@ -108,7 +108,18 @@ final class HttpIntegrationTest extends TestCase
 
         [$docStatus, $docBody] = $this->get('/vendor/bundle.md');
         self::assertSame(200, $docStatus);
-        self::assertStringContainsString('<h1>Vendored</h1>', $docBody);
+        self::assertStringContainsString('<h1 id="vendored">Vendored</h1>', $docBody);
+    }
+
+    #[Test]
+    public function headingIdsCanBeDisabledViaEnv(): void
+    {
+        $this->startServer(extraEnv: ['MONKWARD_HEADING_IDS' => '0']);
+
+        [$status, $body] = $this->get('/hello.md');
+        self::assertSame(200, $status);
+        self::assertStringContainsString('<h1>Hello</h1>', $body);
+        self::assertStringNotContainsString('id="hello"', $body);
     }
 
     #[Test]
@@ -120,7 +131,7 @@ final class HttpIntegrationTest extends TestCase
 
         [$indexStatus, $indexBody] = $this->get('/');
         self::assertSame(200, $indexStatus);
-        self::assertStringContainsString('<h1>Only</h1>', $indexBody);
+        self::assertStringContainsString('<h1 id="only">Only</h1>', $indexBody);
 
         [$otherStatus] = $this->get('/hello.md');
         self::assertSame(404, $otherStatus);
@@ -145,6 +156,7 @@ final class HttpIntegrationTest extends TestCase
             'MONKWARD_SINGLE_FILE' => $singleFile ?? '',
             'MONKWARD_THEME_CSS_PATH' => \dirname(__DIR__) . '/resources/themes/default.css',
             'MONKWARD_IGNORE' => \json_encode(UserConfig::DEFAULT_IGNORE),
+            'MONKWARD_HEADING_IDS' => '1',
         ], $extraEnv);
 
         $process = \proc_open($command, [

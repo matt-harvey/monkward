@@ -63,6 +63,22 @@ TOML);
     }
 
     #[Test]
+    public function headingIdsDefaultsToTrueAndCanBeDisabled(): void
+    {
+        self::assertTrue(UserConfig::fromToml('theme = "x"')->headingIds);
+        self::assertTrue(UserConfig::fromToml('heading_ids = true')->headingIds);
+        self::assertFalse(UserConfig::fromToml('heading_ids = false')->headingIds);
+    }
+
+    #[Test]
+    public function invalidHeadingIdsIsRejected(): void
+    {
+        $this->expectException(MonkwardException::class);
+
+        UserConfig::fromToml('heading_ids = banana');
+    }
+
+    #[Test]
     public function unknownKeysAreIgnored(): void
     {
         $config = UserConfig::fromToml("theme = \"solar\"\nverbosity = 3\n[section]\nfoo = \"bar\"\n");
