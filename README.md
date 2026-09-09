@@ -1,15 +1,17 @@
 # monkward
 
-An on-the-fly Markdown viewer for your current directory. Run `monkward`; it
-starts a local server, opens your browser at
-`http://localhost:8800`, and renders every `.md` file in that directory tree as
-styled HTML. Directories with no markdown are never shown.
+It's 2026 and you're drowning in Markdown files. You need a Markdown browser. One that:
+* Renders on the fly
+* Is invoked with one command
+* Blasts nicely rendered pages into your web browser
+* Lets you browse either a whole directory, or just one file
+* Has sensible but easily overridable defaults (theming, URL, port...)
 
 ## Quick start
 
 ## Prereqs
 * PHP 8.5+
-* `composer`.
+* `composer`
 
 ## Install
 
@@ -49,6 +51,10 @@ monkward --help              # full help
 
 Files are re-read on every request, so edits show up on refresh. Stop the
 server with `Ctrl+C`.
+
+When opened in a directory, monkward will render a file browser; you can click
+around to view the Markdown files contained recursively in that directory. Non-Markdown files
+are intentionally not shown; as are any sub-directories that lack Markdown files.
 
 ## Themes and configuration
 
@@ -94,19 +100,6 @@ make install    # build + install to ~/.local/bin
 make uninstall  # remove the installed phar
 make clean      # remove build artifacts
 ```
-
-## How it works
-
-- The CLI resolves the target, config and theme, then spawns
-  `php -S <host>:<port> -t <temp-docroot> <router>` and opens your browser.
-- The HTTP layer is built on [`substancephp/http`](https://packagist.org/packages/substancephp/http)
-  (PSR-15 middleware, `HtmlRenderer` templates, exception handling) and
-  [`substancephp/container`](https://packagist.org/packages/substancephp/container)
-  (PSR-11 DI), with a small custom matcher/actor substituted in place of the
-  library's filepath routing. Markdown is rendered by
-  [`league/commonmark`](https://packagist.org/packages/league/commonmark).
-- The PHAR is built with [`humbug/box`](https://packagist.org/packages/humbug/box);
-  when `php -S` executes the PHAR its stub boots the HTTP router directly.
 
 ## License
 
