@@ -6,8 +6,6 @@ namespace Monkward\Http;
 
 use SubstancePHP\HTTP\Application;
 use SubstancePHP\HTTP\Middleware\ExceptionHandlerMiddleware;
-use SubstancePHP\HTTP\Middleware\RouteActorMiddleware;
-use SubstancePHP\HTTP\Middleware\RouteMatcherMiddleware;
 use SubstancePHP\HTTP\SubstanceProvider;
 
 final class Server
@@ -18,7 +16,7 @@ final class Server
 
         $app = Application::make(
             env: [],
-            actionRoot: '', // unused: MonkwardProvider overrides both route middlewares
+            actionRoot: '', // unused: monkward supplies its own route middlewares
             templateRoot: $root . '/app/templates',
             providers: [
                 SubstanceProvider::class,
@@ -26,8 +24,8 @@ final class Server
             ],
             middlewares: [
                 ExceptionHandlerMiddleware::class,
-                RouteMatcherMiddleware::class,
-                RouteActorMiddleware::class,
+                MonkwardRouteMatcherMiddleware::class,
+                MonkwardRouteActorMiddleware::class,
             ],
             htmlEncoding: 'UTF-8',
         );

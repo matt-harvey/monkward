@@ -12,8 +12,6 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use SubstancePHP\Container\Container;
 use SubstancePHP\HTTP\ContextFactoryInterface;
 use SubstancePHP\HTTP\EnvironmentInterface;
-use SubstancePHP\HTTP\Middleware\RouteActorMiddleware;
-use SubstancePHP\HTTP\Middleware\RouteMatcherMiddleware;
 use SubstancePHP\HTTP\ProviderInterface;
 use SubstancePHP\HTTP\RendererFactory;
 use SubstancePHP\HTTP\RendererFactoryInterface;
@@ -66,11 +64,11 @@ final class MonkwardProvider implements ProviderInterface
                 ),
             ),
 
-            RouteMatcherMiddleware::class => static fn (Container $c): MonkwardRouteMatcherMiddleware => new MonkwardRouteMatcherMiddleware(
+            MonkwardRouteMatcherMiddleware::class => static fn (Container $c): MonkwardRouteMatcherMiddleware => new MonkwardRouteMatcherMiddleware(
                 assets: $c->get(AssetResponder::class),
             ),
 
-            RouteActorMiddleware::class => static fn (Container $c): MonkwardRouteActorMiddleware => new MonkwardRouteActorMiddleware(
+            MonkwardRouteActorMiddleware::class => static fn (Container $c): MonkwardRouteActorMiddleware => new MonkwardRouteActorMiddleware(
                 container: $c,
                 contextFactory: $c->get(ContextFactoryInterface::class),
                 rendererFactory: $c->get(RendererFactoryInterface::class),
