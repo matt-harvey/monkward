@@ -1,7 +1,6 @@
 # monkward
 
 [![CI](https://github.com/matt-harvey/monkward/actions/workflows/ci.yml/badge.svg)](https://github.com/matt-harvey/monkward/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/matt-harvey/monkward/branch/main/graph/badge.svg)](https://codecov.io/gh/matt-harvey/monkward)
 
 It's 2026, and you&#8217;re drowning in Markdown files. You need a Markdown browser. One that:
 * Starts-and-opens itself in your browser with a single terminal command
@@ -117,11 +116,12 @@ Some JavaScript is inlined to manage the theme selector.
 ## Development
 
 ```bash
-make test       # run the test suite
-make build      # build build/monkward.phar
-make install    # build + install to ~/.local/bin
-make uninstall  # remove the installed phar and ~/.config/monkward
-make clean      # remove build artifacts
+make test            # run the test suite
+make test-coverage   # run the test suite and print line coverage
+make build           # build build/monkward.phar
+make install         # build + install to ~/.local/bin
+make uninstall       # remove the installed phar and ~/.config/monkward
+make clean           # remove build artifacts
 ```
 
 Pull requests and Issues are welcome.

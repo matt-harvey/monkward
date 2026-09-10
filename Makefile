@@ -7,16 +7,17 @@ PHAR := build/monkward.phar
 
 .DEFAULT_GOAL := help
 
-.PHONY: help deps test build install uninstall clean
+.PHONY: help deps test test-coverage build install uninstall clean
 
 help:
 	@echo "monkward — available targets:"
-	@echo "  make deps       Install PHP dependencies (composer install)"
-	@echo "  make test       Run the test suite (composer test)"
-	@echo "  make build      Build $(PHAR) (composer build:phar)"
-	@echo "  make install    Build and install the phar to $(BINDIR)"
-	@echo "  make uninstall  Remove the installed phar and $(CONFIG_DIR)"
-	@echo "  make clean      Remove build artifacts"
+	@echo "  make deps           Install PHP dependencies (composer install)"
+	@echo "  make test           Run the test suite (composer test)"
+	@echo "  make test-coverage  Run the test suite and print line coverage"
+	@echo "  make build          Build $(PHAR) (composer build:phar)"
+	@echo "  make install        Build and install the phar to $(BINDIR)"
+	@echo "  make uninstall      Remove the installed phar and $(CONFIG_DIR)"
+	@echo "  make clean          Remove build artifacts"
 	@echo ""
 	@echo "Variables: PREFIX (default $(HOME)/.local), BINDIR (default \$$(PREFIX)/bin),"
 	@echo "          CONFIG_DIR (default \$$(XDG_CONFIG_HOME) or \$$(HOME)/.config, plus /monkward), COMPOSER, PHP"
@@ -26,6 +27,9 @@ deps:
 
 test: deps
 	$(COMPOSER) test
+
+test-coverage: deps
+	XDEBUG_MODE=coverage $(COMPOSER) test:coverage
 
 build: deps
 	$(COMPOSER) build:phar
