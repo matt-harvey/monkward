@@ -38,7 +38,6 @@ final class MonkwardProvider implements ProviderInterface
             ),
 
             DocPage::class => static fn(Container $c): DocPage => new DocPage(
-                root: $c->get('monkward.target'),
                 singleFile: $c->get('monkward.single-file'),
                 markdown: $c->get(MarkdownRenderer::class),
                 lister: $c->get(DirectoryLister::class),

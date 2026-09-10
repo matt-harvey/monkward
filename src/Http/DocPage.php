@@ -11,7 +11,6 @@ use SubstancePHP\HTTP\Exception\BaseException\UserError;
 final class DocPage
 {
     public function __construct(
-        private string $root,
         private ?string $singleFile,
         private MarkdownRenderer $markdown,
         private DirectoryLister $lister,

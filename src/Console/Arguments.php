@@ -36,14 +36,17 @@ final readonly class Arguments
         public ?string $path = null,
     ) {}
 
+    /** @param list<string> $argv */
     public static function parse(array $argv): self
     {
-        /** @var array{theme: ?string, port: ?int, host: ?string} $values */
-        $values = ['theme' => null, 'port' => null, 'host' => null];
+        $theme = null;
+        $port = null;
+        $host = null;
         $flags = ['open' => false, 'help' => false, 'version' => false, 'init' => false];
         $path = null;
         $positionalOnly = false;
 
+        /** @var list<string> $args */
         $args = \array_slice($argv, 1);
         $count = \count($args);
 
@@ -68,9 +71,16 @@ final readonly class Arguments
             $match = self::matchValueOption($arg, $args, $i);
             if ($match !== null) {
                 $i += $match['consumedExtra'] ? 1 : 0;
-                $values[$match['key']] = $match['key'] === 'port'
-                    ? self::parsePort($match['option'], $match['value'])
-                    : self::requiredValue($match['option'], $match['value']);
+                switch ($match['key']) {
+                    case 'port':
+                        $port = self::parsePort($match['option'], $match['value']);
+                        break;
+                    case 'host':
+                        $host = self::requiredValue($match['option'], $match['value']);
+                        break;
+                    default:
+                        $theme = self::requiredValue($match['option'], $match['value']);
+                }
                 continue;
             }
 
@@ -82,9 +92,9 @@ final readonly class Arguments
         }
 
         return new self(
-            theme: $values['theme'],
-            port: $values['port'],
-            host: $values['host'],
+            theme: $theme,
+            port: $port,
+            host: $host,
             open: $flags['open'],
             help: $flags['help'],
             version: $flags['version'],
@@ -125,6 +135,7 @@ final readonly class Arguments
         return null;
     }
 
+    /** @param-out string $path */
     private static function setPath(string $value, ?string &$path): void
     {
         if ($path !== null) {

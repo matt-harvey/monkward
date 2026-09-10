@@ -16,7 +16,17 @@ final class ListingPage
         private DocPage $docPage,
     ) {}
 
-    /** @return array{single: bool, view: array|null, rootName: string, relDir: string, breadcrumbs: array, dirs: array, files: array} */
+    /**
+     * @return array{
+     *   single: bool,
+     *   view: array{title: string, rel: string, html: string, crumbs: list<array{label: string, href: string}>}|null,
+     *   rootName: string,
+     *   relDir: string,
+     *   breadcrumbs: list<array{label: string, href: string}>,
+     *   dirs: list<array{name: string, href: string}>,
+     *   files: list<array{name: string, md: bool, href: ?string}>
+     * }
+     */
     public function data(string $relativeDir): array
     {
         if ($this->singleFile !== null) {

@@ -40,7 +40,7 @@ final readonly class UserConfig
         $values = self::parseToml($contents);
 
         $theme = null;
-        if (isset($values['theme']) && \is_string($values['theme']) && $values['theme'] !== '') {
+        if (isset($values['theme']) && $values['theme'] !== '') {
             $theme = $values['theme'];
         }
 
@@ -50,12 +50,12 @@ final readonly class UserConfig
         }
 
         $host = null;
-        if (isset($values['host']) && \is_string($values['host']) && $values['host'] !== '') {
+        if (isset($values['host']) && $values['host'] !== '') {
             $host = $values['host'];
         }
 
         $headingIds = true;
-        if (isset($values['heading_ids']) && \is_string($values['heading_ids'])) {
+        if (isset($values['heading_ids'])) {
             $headingIds = self::parseBool($values['heading_ids']);
         }
 

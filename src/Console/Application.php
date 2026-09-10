@@ -22,6 +22,7 @@ final class Application
 
     private bool $stopRequested = false;
 
+    /** @param list<string> $argv */
     public function run(array $argv): int
     {
         try {
