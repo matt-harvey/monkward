@@ -92,7 +92,7 @@ override the config file.
 make test       # run the test suite
 make build      # build build/monkward.phar
 make install    # build + install to ~/.local/bin
-make uninstall  # remove the installed phar
+make uninstall  # remove the installed phar and ~/.config/monkward
 make clean      # remove build artifacts
 ```
 

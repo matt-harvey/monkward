@@ -2,6 +2,7 @@ COMPOSER ?= composer
 PHP ?= php
 PREFIX ?= $(HOME)/.local
 BINDIR ?= $(PREFIX)/bin
+CONFIG_DIR ?= $(if $(XDG_CONFIG_HOME),$(XDG_CONFIG_HOME)/monkward,$(HOME)/.config/monkward)
 PHAR := build/monkward.phar
 
 .DEFAULT_GOAL := help
@@ -14,10 +15,11 @@ help:
 	@echo "  make test       Run the test suite (composer test)"
 	@echo "  make build      Build $(PHAR) (composer build:phar)"
 	@echo "  make install    Build and install the phar to $(BINDIR)"
-	@echo "  make uninstall  Remove the installed phar"
+	@echo "  make uninstall  Remove the installed phar and $(CONFIG_DIR)"
 	@echo "  make clean      Remove build artifacts"
 	@echo ""
-	@echo "Variables: PREFIX (default $(HOME)/.local), BINDIR (default \$$(PREFIX)/bin), COMPOSER, PHP"
+	@echo "Variables: PREFIX (default $(HOME)/.local), BINDIR (default \$$(PREFIX)/bin),"
+	@echo "          CONFIG_DIR (default \$$(XDG_CONFIG_HOME) or \$$(HOME)/.config, plus /monkward), COMPOSER, PHP"
 
 deps:
 	$(COMPOSER) install
@@ -41,8 +43,12 @@ install: build
 	esac
 
 uninstall:
+	@test -n "$(BINDIR)" || { echo "Error: BINDIR is empty (is HOME set?)"; exit 1; }
+	@test -n "$(CONFIG_DIR)" || { echo "Error: CONFIG_DIR is empty (is HOME set?)"; exit 1; }
 	@rm -f "$(BINDIR)/monkward"
+	@rm -rf "$(CONFIG_DIR)"
 	@echo "Removed: $(BINDIR)/monkward"
+	@echo "Removed: $(CONFIG_DIR)"
 
 clean:
 	@rm -rf build .phpunit.cache
