@@ -13,12 +13,12 @@
   --border: #e5e9ee;
   --code-bg: #f2f4f6;
   --code-ink: #b3402e;
-  --pre-bg: #20262e;
-  --pre-ink: #e8ebf0;
+  --pre-bg: #eef7f3;
+  --pre-border: #d7ebe2;
+  --pre-ink: #2b3440;
   --quote-border: #0f766e;
   --quote-bg: #f2f7f5;
   --link: #0f766e;
-  --shadow: 0 1px 2px rgba(43, 52, 64, 0.05), 0 8px 24px rgba(43, 52, 64, 0.06);
 }
 
 * {
@@ -298,11 +298,11 @@ a:hover {
 .markdown-body pre {
   background: var(--pre-bg);
   color: var(--pre-ink);
+  border: 1px solid var(--pre-border);
   padding: 1rem 1.1rem;
   border-radius: 10px;
   overflow-x: auto;
   line-height: 1.5;
-  box-shadow: var(--shadow);
 }
 
 .markdown-body pre code {
