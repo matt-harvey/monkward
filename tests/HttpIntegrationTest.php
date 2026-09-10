@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Monkward\Tests;
 
-use Monkward\Config\UserConfig;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
