@@ -57,8 +57,6 @@ final class ConfigInstaller
 
     public function defaultConfigToml(): string
     {
-        $ignore = '["' . \implode('", "', UserConfig::DEFAULT_IGNORE) . '"]';
-
         return <<<TOML
 # monkward configuration
 # Edit these defaults to taste; run `monkward --help` for details.
@@ -70,10 +68,6 @@ host = "127.0.0.1"
 # Add id="..." attributes to rendered headings so [links](#anchors) work.
 # Set to false to leave headings exactly as written.
 heading_ids = true
-
-# Directory names to skip when scanning for markdown files.
-# Matched case-insensitively; edit the list freely.
-ignore = {$ignore}
 TOML;
     }
 }

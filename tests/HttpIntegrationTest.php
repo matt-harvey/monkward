@@ -54,16 +54,16 @@ final class HttpIntegrationTest extends TestCase
     {
         $this->startServer();
 
-        // Root shows one level: all subdirs (except ignored), all file names.
+        // Root shows one level: all subdirs and all file names.
         [$indexStatus, $indexBody] = $this->get('/');
         self::assertSame(200, $indexStatus);
         self::assertStringContainsString('monkward', $indexBody);
         self::assertStringContainsString('docs/', $indexBody);
         self::assertStringContainsString('empty/', $indexBody);
+        self::assertStringContainsString('vendor/', $indexBody);
+        self::assertStringContainsString('node_modules/', $indexBody);
         self::assertStringContainsString('>hello.md</a>', $indexBody);
         self::assertStringContainsString('<span>notes.txt</span>', $indexBody);
-        self::assertStringNotContainsString('vendor', $indexBody);
-        self::assertStringNotContainsString('node_modules', $indexBody);
 
         // Subdirectory listings go one level down.
         [$docsStatus, $docsBody] = $this->get('/docs/');
@@ -98,37 +98,19 @@ final class HttpIntegrationTest extends TestCase
         [$missingStatus] = $this->get('/missing.md');
         self::assertSame(404, $missingStatus);
 
-        [$ignoredDocStatus] = $this->get('/vendor/bundle.md');
-        self::assertSame(404, $ignoredDocStatus);
+        [$vendorDirStatus, $vendorDirBody] = $this->get('/vendor/');
+        self::assertSame(200, $vendorDirStatus);
+        self::assertStringContainsString('>bundle.md</a>', $vendorDirBody);
 
-        [$ignoredDirStatus] = $this->get('/vendor/');
-        self::assertSame(404, $ignoredDirStatus);
+        [$vendorDocStatus, $vendorDocBody] = $this->get('/vendor/bundle.md');
+        self::assertSame(200, $vendorDocStatus);
+        self::assertStringContainsString('<h1 id="vendored">Vendored</h1>', $vendorDocBody);
 
         [$nonMdStatus] = $this->get('/docs/notes.txt');
         self::assertSame(404, $nonMdStatus);
 
         [$fileAsDirStatus] = $this->get('/notes.txt');
         self::assertSame(404, $fileAsDirStatus);
-    }
-
-    #[Test]
-    public function ignoreEnvControlsTheIgnoreList(): void
-    {
-        $withoutVendor = \array_values(\array_diff(UserConfig::DEFAULT_IGNORE, ['vendor']));
-        $this->startServer(extraEnv: ['MONKWARD_IGNORE' => \json_encode($withoutVendor)]);
-
-        [$indexStatus, $indexBody] = $this->get('/');
-        self::assertSame(200, $indexStatus);
-        self::assertStringContainsString('vendor/', $indexBody);
-        self::assertStringNotContainsString('node_modules', $indexBody);
-
-        [$dirStatus, $dirBody] = $this->get('/vendor/');
-        self::assertSame(200, $dirStatus);
-        self::assertStringContainsString('>bundle.md</a>', $dirBody);
-
-        [$docStatus, $docBody] = $this->get('/vendor/bundle.md');
-        self::assertSame(200, $docStatus);
-        self::assertStringContainsString('<h1 id="vendored">Vendored</h1>', $docBody);
     }
 
     #[Test]
@@ -178,7 +160,6 @@ final class HttpIntegrationTest extends TestCase
             'MONKWARD_TARGET' => $this->target,
             'MONKWARD_SINGLE_FILE' => $singleFile ?? '',
             'MONKWARD_THEME_CSS_PATH' => \dirname(__DIR__) . '/resources/themes/default.css',
-            'MONKWARD_IGNORE' => \json_encode(UserConfig::DEFAULT_IGNORE),
             'MONKWARD_HEADING_IDS' => '1',
         ], $extraEnv);
 

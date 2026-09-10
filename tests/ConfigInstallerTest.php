@@ -57,18 +57,14 @@ final class ConfigInstallerTest extends TestCase
     }
 
     #[Test]
-    public function prebakedConfigContainsTheIgnoreList(): void
+    public function prebakedConfigContainsTheDefaults(): void
     {
         $toml = (new ConfigInstaller())->defaultConfigToml();
 
         self::assertStringContainsString('theme = "default"', $toml);
         self::assertStringContainsString('heading_ids = true', $toml);
-        foreach (UserConfig::DEFAULT_IGNORE as $name) {
-            self::assertStringContainsString('"' . $name . '"', $toml);
-        }
 
         $parsed = UserConfig::fromToml($toml);
-        self::assertSame(UserConfig::DEFAULT_IGNORE, $parsed->ignore);
         self::assertTrue($parsed->headingIds);
     }
 

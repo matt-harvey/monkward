@@ -12,24 +12,10 @@ final readonly class UserConfig
     public const DEFAULT_PORT = 8800;
     public const DEFAULT_HOST = '127.0.0.1';
 
-    /** The prebaked ignore list, also written to new config.toml files. */
-    public const DEFAULT_IGNORE = [
-        '.git',
-        '.svn',
-        '.hg',
-        '.idea',
-        '.vscode',
-        'vendor',
-        'node_modules',
-        'bower_components',
-    ];
-
     public function __construct(
         public ?string $theme = null,
         public ?int $port = null,
         public ?string $host = null,
-        /** @var list<string> */
-        public array $ignore = self::DEFAULT_IGNORE,
         public bool $headingIds = true,
     ) {
     }
@@ -39,12 +25,12 @@ final readonly class UserConfig
         $configDir = self::configDir();
         $file = $configDir === null ? null : "{$configDir}/config.toml";
         if ($file === null || ! \is_file($file)) {
-            return new self(ignore: self::DEFAULT_IGNORE);
+            return new self();
         }
 
         $contents = @\file_get_contents($file);
         if ($contents === false) {
-            return new self(ignore: self::DEFAULT_IGNORE);
+            return new self();
         }
 
         return self::fromToml($contents);
@@ -69,16 +55,12 @@ final readonly class UserConfig
             $host = $values['host'];
         }
 
-        $ignore = isset($values['ignore']) && \is_string($values['ignore'])
-            ? self::parseStringList($values['ignore'])
-            : self::DEFAULT_IGNORE;
-
         $headingIds = true;
         if (isset($values['heading_ids']) && \is_string($values['heading_ids'])) {
             $headingIds = self::parseBool($values['heading_ids']);
         }
 
-        return new self($theme, $port, $host, $ignore, $headingIds);
+        return new self($theme, $port, $host, $headingIds);
     }
 
     public static function configDir(): ?string
@@ -105,8 +87,7 @@ final readonly class UserConfig
 
     /**
      * Parses the small TOML subset monkward understands: top-level `key = "value"` /
-     * `key = 'value'` / `key = 123` / `key = ["a", "b"]` lines, with `#` comments.
-     * Everything else is ignored.
+     * `key = 'value'` / `key = 123` lines, with `#` comments. Everything else is ignored.
      *
      * @return array<string, string>
      */
@@ -149,10 +130,6 @@ final readonly class UserConfig
             $end = \strrpos($value, "'");
             return $end === false || $end === 0 ? $value : \substr($value, 0, $end + 1);
         }
-        if (\str_starts_with($value, '[')) {
-            $end = \strrpos($value, ']');
-            return $end === false ? $value : \substr($value, 0, $end + 1);
-        }
         $stripped = \preg_replace('/\s+#.*$/', '', $value);
         return $stripped ?? $value;
     }
@@ -167,29 +144,6 @@ final readonly class UserConfig
             return \substr($value, 1, -1);
         }
         return $value;
-    }
-
-    /** @return list<string> */
-    private static function parseStringList(string $value): array
-    {
-        if (! \str_starts_with($value, '[')) {
-            return $value === '' ? [] : [self::unquote($value)];
-        }
-
-        $inner = \trim($value, '[]');
-        if ($inner === '') {
-            return [];
-        }
-
-        $items = [];
-        foreach (\explode(',', $inner) as $item) {
-            $item = self::unquote(\trim($item));
-            if ($item !== '') {
-                $items[] = $item;
-            }
-        }
-
-        return $items;
     }
 
     private static function parsePort(string $value): int

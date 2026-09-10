@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Monkward\Tests;
 
-use Monkward\Config\UserConfig;
 use Monkward\Site\DirectoryLister;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -37,10 +36,13 @@ final class DirectoryListerTest extends TestCase
     #[Test]
     public function listsOneLevelWithDirectoriesFirstThenMarkdownThenOtherFiles(): void
     {
-        $lister = new DirectoryLister($this->root, UserConfig::DEFAULT_IGNORE);
+        $lister = new DirectoryLister($this->root);
         $listing = $lister->list('');
 
-        self::assertSame(['docs', 'empty'], \array_column($listing['dirs'], 'name'));
+        self::assertSame(
+            ['docs', 'empty', 'node_modules', 'vendor'],
+            \array_column($listing['dirs'], 'name'),
+        );
         self::assertSame(['hello.md', '.env', 'notes.txt'], \array_column($listing['files'], 'name'));
 
         self::assertSame('/docs/', $listing['dirs'][0]['href']);
@@ -53,7 +55,7 @@ final class DirectoryListerTest extends TestCase
     #[Test]
     public function listsSubdirectoriesOneLevelAtATime(): void
     {
-        $lister = new DirectoryLister($this->root, UserConfig::DEFAULT_IGNORE);
+        $lister = new DirectoryLister($this->root);
 
         $docs = $lister->list('docs');
         self::assertSame([], $docs['dirs']);
@@ -65,40 +67,9 @@ final class DirectoryListerTest extends TestCase
     }
 
     #[Test]
-    public function ignoredDirectoryNamesAreSkipped(): void
-    {
-        $lister = new DirectoryLister($this->root, UserConfig::DEFAULT_IGNORE);
-        $names = \array_column($lister->list('')['dirs'], 'name');
-
-        self::assertNotContains('vendor', $names);
-        self::assertNotContains('node_modules', $names);
-    }
-
-    #[Test]
-    public function isIgnoredPathMatchesDirectorySegments(): void
-    {
-        $lister = new DirectoryLister($this->root, UserConfig::DEFAULT_IGNORE);
-
-        self::assertTrue($lister->isIgnoredPath('vendor/bundle.md'));
-        self::assertTrue($lister->isIgnoredPath('a/node_modules/b.md'));
-        self::assertFalse($lister->isIgnoredPath('docs/guide.md'));
-    }
-
-    #[Test]
-    public function isIgnoredDirChecksTheDirectoryItself(): void
-    {
-        $lister = new DirectoryLister($this->root, UserConfig::DEFAULT_IGNORE);
-
-        self::assertTrue($lister->isIgnoredDir('vendor'));
-        self::assertTrue($lister->isIgnoredDir('a/vendor/b'));
-        self::assertFalse($lister->isIgnoredDir('docs'));
-        self::assertFalse($lister->isIgnoredDir(''));
-    }
-
-    #[Test]
     public function resolveDirAndFileStayWithinRoot(): void
     {
-        $lister = new DirectoryLister($this->root, UserConfig::DEFAULT_IGNORE);
+        $lister = new DirectoryLister($this->root);
 
         self::assertSame($this->root . '/docs', $lister->resolveDir('docs'));
         self::assertSame($this->root . '/docs/guide.md', $lister->resolveFile('docs/guide.md'));

@@ -52,7 +52,6 @@ final class Application
             $themeName = $args->theme ?? $config->theme;
             $port = $args->port ?? $config->port ?? UserConfig::DEFAULT_PORT;
             $host = $args->host ?? $config->host ?? UserConfig::DEFAULT_HOST;
-            $ignore = \array_merge($config->ignore, $args->ignore);
             $headingIds = $config->headingIds;
 
             $theme = (new ThemeManager())->resolve($themeName, strict: $args->theme !== null);
@@ -64,7 +63,7 @@ final class Application
             $this->registerSignalHandlers();
 
             $url = \sprintf('http://%s:%d', $host, $port);
-            $this->startServer($host, $port, $this->routerPath(), $target, $singleFile, $theme->path, $ignore, $headingIds);
+            $this->startServer($host, $port, $this->routerPath(), $target, $singleFile, $theme->path, $headingIds);
 
             $this->stdout(\sprintf('monkward %s serving %s at %s', Version::VERSION, $target, $url));
             $this->stdout('Press Ctrl+C to stop.');
@@ -165,7 +164,6 @@ final class Application
         string $target,
         ?string $singleFile,
         string $themeCssPath,
-        array $ignore,
         bool $headingIds,
     ): void {
         $command = [
@@ -181,7 +179,6 @@ final class Application
             'MONKWARD_TARGET' => $target,
             'MONKWARD_SINGLE_FILE' => $singleFile ?? '',
             'MONKWARD_THEME_CSS_PATH' => $themeCssPath,
-            'MONKWARD_IGNORE' => \json_encode(\array_values($ignore), \JSON_THROW_ON_ERROR),
             'MONKWARD_HEADING_IDS' => $headingIds ? '1' : '0',
         ]);
 
@@ -436,18 +433,14 @@ Options:
   --theme=NAME             Use ~/.config/monkward/themes/NAME.css
   --port=PORT              Port to serve on (default: 8800)
   --host=HOST              Host to bind (default: 127.0.0.1)
-  --ignore=NAME            Also ignore this directory name for this run (repeatable)
   --open                   Open the default browser at the served URL
   --init                   Create ~/.config/monkward with config.toml and themes/default.css
   -h, --help               Show this help
   -V, --version            Show the version
 
 Configuration lives in ~/.config/monkward/config.toml (created on install or
-first run). The `ignore` key is the full list of directory names to skip, e.g.:
-
-      ignore = [".git", "vendor", "node_modules"]
-
-Set `heading_ids = false` to stop adding id="..." attributes to headings.
+first run). Set `heading_ids = false` to stop adding id="..." attributes to
+headings.
 
 Theme stylesheets live in ~/.config/monkward/themes/ (e.g. yeah.css); the
 default theme is copied there as default.css so it can be edited.

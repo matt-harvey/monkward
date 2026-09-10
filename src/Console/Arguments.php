@@ -17,8 +17,6 @@ final readonly class Arguments
         public bool $version = false,
         public bool $init = false,
         public ?string $path = null,
-        /** @var list<string> */
-        public array $ignore = [],
     ) {
     }
 
@@ -32,7 +30,6 @@ final readonly class Arguments
         $version = false;
         $init = false;
         $path = null;
-        $ignore = [];
         $positionalOnly = false;
 
         $args = \array_slice($argv, 1);
@@ -101,16 +98,6 @@ final readonly class Arguments
                 continue;
             }
 
-            if (\str_starts_with($arg, '--ignore=')) {
-                self::appendList($ignore, \substr($arg, 9));
-                continue;
-            }
-            if ($arg === '--ignore') {
-                self::appendList($ignore, self::nextValue($args, $i));
-                $i++;
-                continue;
-            }
-
             if (\str_starts_with($arg, '-')) {
                 throw new MonkwardException("unknown option: $arg (try --help)");
             }
@@ -127,7 +114,6 @@ final readonly class Arguments
             version: $version,
             init: $init,
             path: $path,
-            ignore: $ignore,
         );
     }
 
@@ -137,17 +123,6 @@ final readonly class Arguments
             throw new MonkwardException('expected at most one path argument');
         }
         $path = $value;
-    }
-
-    /** @param list<string> $list */
-    private static function appendList(array &$list, string $value): void
-    {
-        foreach (\explode(',', $value) as $item) {
-            $item = \trim($item);
-            if ($item !== '') {
-                $list[] = $item;
-            }
-        }
     }
 
     /** @param list<string> $args */

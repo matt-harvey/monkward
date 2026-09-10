@@ -45,18 +45,6 @@ final class ArgumentsTest extends TestCase
     }
 
     #[Test]
-    public function parsesIgnoreList(): void
-    {
-        $args = Arguments::parse([
-            'monkward',
-            '--ignore=vendor',
-            '--ignore', 'build,tmp',
-        ]);
-
-        self::assertSame(['vendor', 'build', 'tmp'], $args->ignore);
-    }
-
-    #[Test]
     public function parsesInitFlag(): void
     {
         self::assertTrue(Arguments::parse(['monkward', '--init'])->init);

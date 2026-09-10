@@ -37,32 +37,6 @@ TOML);
     }
 
     #[Test]
-    public function parsesIgnoreArray(): void
-    {
-        $config = UserConfig::fromToml(<<<'TOML'
-ignore = ["build", "tmp"]
-TOML);
-
-        self::assertSame(['build', 'tmp'], $config->ignore);
-    }
-
-    #[Test]
-    public function missingIgnoreKeyFallsBackToPrebakedList(): void
-    {
-        $config = UserConfig::fromToml('theme = "solar"');
-
-        self::assertSame(UserConfig::DEFAULT_IGNORE, $config->ignore);
-    }
-
-    #[Test]
-    public function explicitEmptyIgnoreListIsRespected(): void
-    {
-        $config = UserConfig::fromToml('ignore = []');
-
-        self::assertSame([], $config->ignore);
-    }
-
-    #[Test]
     public function headingIdsDefaultsToTrueAndCanBeDisabled(): void
     {
         self::assertTrue(UserConfig::fromToml('theme = "x"')->headingIds);

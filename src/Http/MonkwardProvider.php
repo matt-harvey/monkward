@@ -25,7 +25,6 @@ final class MonkwardProvider implements ProviderInterface
             'monkward.target' => static fn (): string => \getenv('MONKWARD_TARGET') ?: '',
             'monkward.single-file' => static fn (): ?string => \getenv('MONKWARD_SINGLE_FILE') ?: null,
             'monkward.theme-css-path' => static fn (): string => \getenv('MONKWARD_THEME_CSS_PATH') ?: '',
-            'monkward.ignore' => static fn (): array => self::decodeList(\getenv('MONKWARD_IGNORE')),
             'monkward.heading-ids' => static fn (): bool => self::decodeBool(\getenv('MONKWARD_HEADING_IDS'), true),
 
             MarkdownRenderer::class => static fn (Container $c): MarkdownRenderer => new MarkdownRenderer(
@@ -34,7 +33,6 @@ final class MonkwardProvider implements ProviderInterface
 
             DirectoryLister::class => static fn (Container $c): DirectoryLister => new DirectoryLister(
                 root: $c->get('monkward.target'),
-                ignore: $c->get('monkward.ignore'),
             ),
 
             DocPage::class => static fn (Container $c): DocPage => new DocPage(
@@ -74,21 +72,6 @@ final class MonkwardProvider implements ProviderInterface
                 responseFactory: $c->get(ResponseFactoryInterface::class),
             ),
         ];
-    }
-
-    /** @return list<string> */
-    private static function decodeList(string|false $env): array
-    {
-        if ($env === false || $env === '') {
-            return [];
-        }
-
-        $decoded = \json_decode($env, true);
-        if (! \is_array($decoded)) {
-            return [];
-        }
-
-        return \array_values(\array_filter($decoded, 'is_string'));
     }
 
     private static function decodeBool(string|false $env, bool $default): bool

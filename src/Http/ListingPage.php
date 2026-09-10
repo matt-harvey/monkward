@@ -36,9 +36,6 @@ final class ListingPage
             ];
         }
 
-        if ($relativeDir !== '' && $this->lister->isIgnoredDir($relativeDir)) {
-            UserError::throw(404);
-        }
         if ($this->lister->resolveDir($relativeDir) === null) {
             UserError::throw(404);
         }

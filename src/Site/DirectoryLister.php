@@ -6,46 +6,9 @@ namespace Monkward\Site;
 
 final class DirectoryLister
 {
-    /** @var list<string> lowercase directory names that are ignored */
-    private array $ignoredDirs;
-
-    /** @param list<string> $ignore directory names to ignore (case-insensitive) */
     public function __construct(
         private string $root,
-        array $ignore = [],
     ) {
-        $this->ignoredDirs = \array_values(\array_map('strtolower', $ignore));
-    }
-
-    /** Whether a relative file path passes through an ignored directory (file name ignored). */
-    public function isIgnoredPath(string $relativePath): bool
-    {
-        $parts = \explode('/', \str_replace('\\', '/', $relativePath));
-        \array_pop($parts); // the last segment is the file name; ignore applies to directories
-
-        foreach ($parts as $part) {
-            if (\in_array(\strtolower($part), $this->ignoredDirs, true)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /** Whether a relative directory path is or passes through an ignored directory. */
-    public function isIgnoredDir(string $relativeDir): bool
-    {
-        if ($relativeDir === '') {
-            return false;
-        }
-
-        foreach (\explode('/', \str_replace('\\', '/', $relativeDir)) as $part) {
-            if ($part !== '' && \in_array(\strtolower($part), $this->ignoredDirs, true)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public function resolveDir(string $relativeDir): ?string
@@ -84,8 +47,7 @@ final class DirectoryLister
 
     /**
      * Lists one level of a directory: directories first, then markdown files,
-     * then everything else. Hidden entries are shown; ignored directories are
-     * skipped.
+     * then everything else.
      *
      * @return array{dirs: list<array{name: string, href: string}>, files: list<array{name: string, md: bool, href: ?string}>}
      */
@@ -111,7 +73,7 @@ final class DirectoryLister
             $path = \rtrim($abs, '/\\') . \DIRECTORY_SEPARATOR . $name;
             $rel = $relativeDir === '' ? $name : $relativeDir . '/' . $name;
 
-            if (\is_dir($path) && ! $this->isIgnoredName($name)) {
+            if (\is_dir($path)) {
                 $dirs[] = ['name' => $name, 'href' => '/' . self::encodePath($rel) . '/'];
                 continue;
             }
@@ -140,11 +102,6 @@ final class DirectoryLister
     public static function encodePath(string $path): string
     {
         return \implode('/', \array_map('rawurlencode', \explode('/', \str_replace('\\', '/', $path))));
-    }
-
-    private function isIgnoredName(string $name): bool
-    {
-        return \in_array(\strtolower($name), $this->ignoredDirs, true);
     }
 
     private function isWithinRoot(string $rootReal, string $real): bool

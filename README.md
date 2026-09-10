@@ -44,7 +44,6 @@ monkward --open              # also open the default browser at the URL
 monkward --theme=yeah        # use ~/.config/monkward/themes/yeah.css
 monkward --port=9000         # serve on a different port
 monkward --host=0.0.0.0      # bind a different host
-monkward --ignore=build      # also ignore a directory name for this run
 monkward --init              # (re)create ~/.config/monkward with the defaults
 monkward --help              # full help
 ```
@@ -74,7 +73,6 @@ theme = "default"
 port = 8800
 host = "127.0.0.1"
 heading_ids = true
-ignore = [".git", ".svn", ".hg", ".idea", ".vscode", "vendor", "node_modules", "bower_components"]
 ```
 
 `themes/default.css` is the default theme, copied there so you can see and
@@ -84,18 +82,6 @@ override the config file.
 
 `heading_ids = true` adds `id="..."` attributes to rendered headings so
 `[links](#anchors)` work. Set it to `false` to leave headings untouched.
-
-## Ignored directories
-
-The `ignore` key in `config.toml` is the full list of directory names monkward
-skips — ignored directories are neither listed nor navigable, and files inside
-them can't be served directly. You can edit this list as you see fit. For a
-one-off addition, pass `--ignore=other_dir` to also ignore `other_dir` for
-that run.
-
-```bash
-monkward --ignore=build,tmp
-```
 
 ## Development
 

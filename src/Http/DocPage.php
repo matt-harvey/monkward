@@ -31,10 +31,6 @@ final class DocPage
             UserError::throw(404);
         }
 
-        if ($this->singleFile === null && $this->lister->isIgnoredPath($relative)) {
-            UserError::throw(404);
-        }
-
         $absolute = $this->lister->resolveFile($relative);
         if ($absolute === null) {
             UserError::throw(404);
