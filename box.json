@@ -10,6 +10,7 @@
     ],
     "files": [
         "bin/monkward",
+        "bin/bootstrap.php",
         "bin/server.php",
         "LICENSE",
         "composer.json"

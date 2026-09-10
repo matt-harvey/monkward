@@ -1,7 +1,7 @@
 {
     "name": "monkward/monkward",
     "description": "An on-the-fly Markdown viewer served over localhost, installable as a PHAR.",
-    "type": "project",
+    "type": "library",
     "license": "MIT",
     "keywords": ["markdown", "viewer", "cli", "phar", "server"],
     "require": {

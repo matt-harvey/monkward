@@ -29,6 +29,17 @@ make install
 `PATH` if it isn&#8217;t already.) It also initializes `~/.config/monkward/` with an editable
 `config.toml` and the built-in `light.css` / `dark.css` themes.
 
+Or install it globally as a Composer package:
+
+```bash
+composer global require monkward/monkward
+monkward
+```
+
+(If Composer's global `bin` directory is not on your `PATH`, Composer will say so;
+add it and you're set.) For a single project, use
+`composer require --dev monkward/monkward` and run `vendor/bin/monkward`.
+
 ## Usage
 
 Start the monkward server in your current directory, serving to `localhost:8080`:
