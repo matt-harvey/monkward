@@ -16,7 +16,14 @@ final class DocPage
         private DirectoryLister $lister,
     ) {}
 
-    /** @return array{title: string, rel: string, html: string, crumbs: list<array{label: string, href: string}>} */
+    /**
+     * @return array{
+     *     title: string,
+     *     rel: string,
+     *     html: string,
+     *     crumbs: list<array{label: string, href: string}>
+     * }
+     */
     public function render(string $relative): array
     {
         $relative = \str_replace('\\', '/', $relative);

@@ -14,7 +14,14 @@ final class ArgumentsTest extends TestCase
     #[Test]
     public function parsesFlagsAndPath(): void
     {
-        $args = Arguments::parse(['monkward', '--theme=yeah', '--port', '9000', '--host=0.0.0.0', '--open', 'docs']);
+        $args = Arguments::parse([
+            'monkward',
+            '--theme=yeah',
+            '--port', '9000',
+            '--host=0.0.0.0',
+            '--open',
+            'docs',
+        ]);
 
         self::assertSame('yeah', $args->theme);
         self::assertSame(9000, $args->port);

@@ -11,8 +11,6 @@ use SubstancePHP\HTTP\Respond;
 
 final class AssetResponder
 {
-    private const FAVICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#0f766e"/><text x="16" y="22.5" font-family="ui-monospace,monospace" font-size="17" font-weight="700" text-anchor="middle" fill="#f0fdfa">m</text></svg>';
-
     public function __construct(
         private ThemeRegistry $themes,
         private string $defaultTheme,
@@ -36,10 +34,19 @@ final class AssetResponder
         }
 
         if ($file === 'favicon.svg') {
-            return $respond(200, self::FAVICON, 'image/svg+xml; charset=utf-8');
+            return $respond(200, $this->favicon(), 'image/svg+xml; charset=utf-8');
         }
 
         UserError::throw(404);
+    }
+
+    private function favicon(): string
+    {
+        return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">'
+            . '<rect width="32" height="32" rx="7" fill="#0f766e"/>'
+            . '<text x="16" y="22.5" font-family="ui-monospace,monospace" font-size="17" '
+            . 'font-weight="700" text-anchor="middle" fill="#f0fdfa">m</text>'
+            . '</svg>';
     }
 
     private function respondThemeCss(Respond $respond, QueryParams $query): mixed

@@ -99,7 +99,7 @@ override the config file.
 ## How it works
 
 monkward starts the built-in PHP web server, listening at localhost. It intercepts each
-request, using `league/commonmark` to convert any markdown files it encounters into HTML
+request, using `league/commonmark` to convert any asked-for markdown files into HTML
 on the fly. `substancephp/http` and `substancephp/container` are used for some of the
 plumbing in between. Some JavaScript is inlined to manage the theme selector.
 

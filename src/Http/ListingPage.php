@@ -18,13 +18,18 @@ final class ListingPage
 
     /**
      * @return array{
-     *   single: bool,
-     *   view: array{title: string, rel: string, html: string, crumbs: list<array{label: string, href: string}>}|null,
-     *   rootName: string,
-     *   relDir: string,
-     *   breadcrumbs: list<array{label: string, href: string}>,
-     *   dirs: list<array{name: string, href: string}>,
-     *   files: list<array{name: string, md: bool, href: ?string}>
+     *     single: bool,
+     *     view: array{
+     *         title: string,
+     *         rel: string,
+     *         html: string,
+     *         crumbs: list<array{label: string, href: string}>
+     *     }|null,
+     *     rootName: string,
+     *     relDir: string,
+     *     breadcrumbs: list<array{label: string, href: string}>,
+     *     dirs: list<array{name: string, href: string}>,
+     *     files: list<array{name: string, md: bool, href: ?string}>
      * }
      */
     public function data(string $relativeDir): array

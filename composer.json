@@ -14,7 +14,8 @@
         "friendsofphp/php-cs-fixer": "^3.95",
         "humbug/box": "^4.7",
         "phpstan/phpstan": "^2.2",
-        "phpunit/phpunit": "^12.1"
+        "phpunit/phpunit": "^12.1",
+        "squizlabs/php_codesniffer": "^4.0"
     },
     "autoload": {
         "psr-4": {
@@ -26,7 +27,10 @@
     ],
     "scripts": {
         "test": "phpunit",
-        "lint:check": "php-cs-fixer fix --dry-run --diff",
+        "lint:check": [
+            "php-cs-fixer fix --dry-run --diff",
+            "phpcs"
+        ],
         "lint:fix": "php-cs-fixer fix",
         "stan": "phpstan analyse --no-progress",
         "build:phar": "bin/build-phar",

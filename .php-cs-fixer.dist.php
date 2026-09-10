@@ -17,5 +17,6 @@ return (new Config())
         '@PER-CS2.0' => true,
         'declare_strict_types' => true,
         'no_unused_imports' => true,
+        'single_quote' => true,
     ])
     ->setFinder($finder);

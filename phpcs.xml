@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<ruleset name="monkward">
+    <description>Line length rules for monkward.</description>
+
+    <file>src</file>
+    <file>tests</file>
+    <file>bin</file>
+    <file>app</file>
+
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="110"/>
+            <property name="absoluteLineLimit" value="110"/>
+        </properties>
+    </rule>
+</ruleset>

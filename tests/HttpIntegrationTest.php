@@ -237,7 +237,9 @@ final class HttpIntegrationTest extends TestCase
             self::fail('could not create temp file');
         }
         $url = 'http://127.0.0.1:' . $this->port . $path;
-        $output = \shell_exec('curl -s -o ' . \escapeshellarg($bodyFile) . ' -w "%{http_code}" ' . \escapeshellarg($url) . ' 2>&1');
+        $command = 'curl -s -o ' . \escapeshellarg($bodyFile)
+            . ' -w "%{http_code}" ' . \escapeshellarg($url) . ' 2>&1';
+        $output = \shell_exec($command);
         $status = (int) \trim((string) $output);
         $body = (string) \file_get_contents($bodyFile);
         \unlink($bodyFile);

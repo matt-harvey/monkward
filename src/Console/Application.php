@@ -59,7 +59,11 @@ final class Application
                 if ($args->theme !== null) {
                     throw new MonkwardException("theme '{$themeName}' not found");
                 }
-                $this->stderr("monkward: warning: theme '{$themeName}' not found; falling back to '" . UserConfig::DEFAULT_THEME . "'");
+                $this->stderr(
+                    "monkward: warning: theme '{$themeName}' not found; falling back to '"
+                    . UserConfig::DEFAULT_THEME
+                    . "'",
+                );
                 $themeName = UserConfig::DEFAULT_THEME;
             }
 
@@ -70,7 +74,15 @@ final class Application
             $this->registerSignalHandlers();
 
             $url = \sprintf('http://%s:%d', $host, $port);
-            $this->startServer($host, $port, $this->routerPath(), $target, $singleFile, $themeName, $headingIds);
+            $this->startServer(
+                $host,
+                $port,
+                $this->routerPath(),
+                $target,
+                $singleFile,
+                $themeName,
+                $headingIds,
+            );
 
             $this->stdout(\sprintf('monkward %s serving %s at %s', Version::VERSION, $target, $url));
             $this->stdout('Press Ctrl+C to stop.');

@@ -24,8 +24,12 @@ final class MonkwardProvider implements ProviderInterface
         return [
             'monkward.target' => static fn(): string => \getenv('MONKWARD_TARGET') ?: '',
             'monkward.single-file' => static fn(): ?string => \getenv('MONKWARD_SINGLE_FILE') ?: null,
-            'monkward.default-theme' => static fn(): string => \getenv('MONKWARD_DEFAULT_THEME') ?: UserConfig::DEFAULT_THEME,
-            'monkward.heading-ids' => static fn(): bool => self::decodeBool(\getenv('MONKWARD_HEADING_IDS'), true),
+            'monkward.default-theme' => static fn(): string => \getenv('MONKWARD_DEFAULT_THEME')
+                ?: UserConfig::DEFAULT_THEME,
+            'monkward.heading-ids' => static fn(): bool => self::decodeBool(
+                \getenv('MONKWARD_HEADING_IDS'),
+                true,
+            ),
 
             ThemeRegistry::class => static fn(): ThemeRegistry => new ThemeRegistry(),
 
@@ -55,24 +59,27 @@ final class MonkwardProvider implements ProviderInterface
                 defaultTheme: $c->get('monkward.default-theme'),
             ),
 
-            RendererFactoryInterface::class => static fn(Container $c): MonkwardRendererFactory => new MonkwardRendererFactory(
-                new RendererFactory(
-                    templateRoot: $c->get('substance.template-root'),
-                    htmlEncoding: $c->get('substance.html-encoding'),
-                    defaultLayout: $c->get('substance.default-layout'),
+            RendererFactoryInterface::class => static fn(Container $c): MonkwardRendererFactory
+                => new MonkwardRendererFactory(
+                    new RendererFactory(
+                        templateRoot: $c->get('substance.template-root'),
+                        htmlEncoding: $c->get('substance.html-encoding'),
+                        defaultLayout: $c->get('substance.default-layout'),
+                    ),
                 ),
-            ),
 
-            MonkwardRouteMatcherMiddleware::class => static fn(Container $c): MonkwardRouteMatcherMiddleware => new MonkwardRouteMatcherMiddleware(
-                assets: $c->get(AssetResponder::class),
-            ),
+            MonkwardRouteMatcherMiddleware::class => static fn(Container $c)
+                => new MonkwardRouteMatcherMiddleware(
+                    assets: $c->get(AssetResponder::class),
+                ),
 
-            MonkwardRouteActorMiddleware::class => static fn(Container $c): MonkwardRouteActorMiddleware => new MonkwardRouteActorMiddleware(
-                container: $c,
-                contextFactory: $c->get(ContextFactoryInterface::class),
-                rendererFactory: $c->get(RendererFactoryInterface::class),
-                responseFactory: $c->get(ResponseFactoryInterface::class),
-            ),
+            MonkwardRouteActorMiddleware::class => static fn(Container $c)
+                => new MonkwardRouteActorMiddleware(
+                    container: $c,
+                    contextFactory: $c->get(ContextFactoryInterface::class),
+                    rendererFactory: $c->get(RendererFactoryInterface::class),
+                    responseFactory: $c->get(ResponseFactoryInterface::class),
+                ),
         ];
     }
 

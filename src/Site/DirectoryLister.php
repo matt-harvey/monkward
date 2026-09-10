@@ -48,7 +48,10 @@ final class DirectoryLister
      * Lists one level of a directory: directories first, then markdown files,
      * then everything else.
      *
-     * @return array{dirs: list<array{name: string, href: string}>, files: list<array{name: string, md: bool, href: ?string}>}
+     * @return array{
+     *     dirs: list<array{name: string, href: string}>,
+     *     files: list<array{name: string, md: bool, href: ?string}>
+     * }
      */
     public function list(string $relativeDir): array
     {

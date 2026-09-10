@@ -44,7 +44,8 @@ final class ThemeRegistryTest extends TestCase
         $registry = new ThemeRegistry();
 
         self::assertContains('yeah', $registry->availableThemes());
-        self::assertStringContainsString('body { color: red; }', (string) \file_get_contents($registry->resolvePath('yeah')));
+        $css = (string) \file_get_contents($registry->resolvePath('yeah'));
+        self::assertStringContainsString('body { color: red; }', $css);
     }
 
     #[Test]
