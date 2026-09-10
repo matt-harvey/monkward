@@ -8,7 +8,7 @@ use SubstancePHP\HTTP\Renderer\HtmlRenderer;
 /** @var string $title */
 /** @var string $rel */
 /** @var string $html */
-/** @var array $crumbs */
+/** @var list<array{label: string, href: string}> $crumbs */
 ?>
 
 <?php $this->layout('layout', ['title' => $title]); ?>

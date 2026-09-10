@@ -6,12 +6,12 @@ use SubstancePHP\HTTP\Renderer\HtmlRenderer;
 
 /** @var HtmlRenderer $this */
 /** @var bool $single */
-/** @var array|null $view */
+/** @var array{title: string, rel: string, html: string, crumbs: list<array{label: string, href: string}>}|null $view */
 /** @var string $rootName */
 /** @var string $relDir */
-/** @var array $breadcrumbs */
-/** @var array $dirs */
-/** @var array $files */
+/** @var list<array{label: string, href: string}> $breadcrumbs */
+/** @var list<array{name: string, href: string}> $dirs */
+/** @var list<array{name: string, md: bool, href: ?string}> $files */
 ?>
 
 <?php

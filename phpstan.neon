@@ -1,5 +1,9 @@
+includes:
+    - vendor/substancephp/http/extension.neon
+
 parameters:
     level: 7
     paths:
         - src
+        - app/templates
     tmpDir: .phpstan-cache
