@@ -3,12 +3,13 @@
 [![CI](https://github.com/matt-harvey/monkward/actions/workflows/ci.yml/badge.svg)](https://github.com/matt-harvey/monkward/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/matt-harvey/monkward/branch/main/graph/badge.svg)](https://codecov.io/gh/matt-harvey/monkward)
 
-It's 2026 and you're drowning in Markdown files. You need a Markdown browser. One that:
-* Renders on the fly
-* Is invoked with one command
-* Blasts nicely rendered pages into your web browser
+It's 2026, and you&#8217;re drowning in Markdown files. You need a Markdown browser. One that:
+* Starts-and-opens itself in your browser with a single terminal command
+* Renders nice web pages on the fly
+* Comes with light and dark mode out of the box
+* Lets you add or override those themes with your own stylesheets
 * Lets you browse either a whole directory, or just one file
-* Has sensible but easily overridable defaults (theming, URL, port...)
+* Comes with sensible, overridable defaults. (Another `monkward` session hogging `:8800`? Just pass `--port=8801`.)
 
 ## Quick start
 
@@ -23,20 +24,26 @@ git clone <this-repo> && cd <this-repo>
 make install
 ```
 
-`make install` builds a PHAR and drops it in `~/.local/bin`
-(override with `make install PREFIX=/somewhere`), so `monkward` is on your
-`PATH` immediately. It also initializes `~/.config/monkward/` with an editable
+`make install` builds a PHAR and puts it in `~/.local/bin`
+(override with `make install PREFIX=/somewhere`). (You need to add that directory to your
+`PATH` if it isn&#8217;t already.) It also initializes `~/.config/monkward/` with an editable
 `config.toml` and the built-in `light.css` / `dark.css` themes.
 
 ## Usage
 
-Starts the monkward server in your current directory, serving to `localhost:8080`:
+Start the monkward server in your current directory, serving to `localhost:8080`:
 
 ```
 monkward
 ```
 
-Options:
+Tell it to open in your default browser at the same time:
+
+```
+monkward --open
+```
+
+All the options:
 
 ```bash
 monkward                     # serve the current directory
@@ -89,6 +96,13 @@ override the config file.
 `heading_ids = true` adds `id="..."` attributes to rendered headings so
 `[links](#anchors)` work. Set it to `false` to leave headings untouched.
 
+## How it works
+
+monkward starts the built-in PHP web server, listening at localhost. It intercepts each
+request, using `league/commonmark` to convert any markdown files it encounters into HTML
+on the fly. `substancephp/http` and `substancephp/container` are used for some of the
+plumbing in between. Some JavaScript is inlined to manage the theme selector.
+
 ## Development
 
 ```bash
@@ -98,6 +112,8 @@ make install    # build + install to ~/.local/bin
 make uninstall  # remove the installed phar and ~/.config/monkward
 make clean      # remove build artifacts
 ```
+
+Pull requests and Issues are welcome.
 
 ## License
 
