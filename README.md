@@ -41,7 +41,7 @@ add it and you're set.) For a single project, use
 
 ## Usage
 
-Start the monkward server in your current directory, serving to `localhost:8080`:
+Start the monkward server in your current directory, serving to `localhost:8800`:
 
 ```
 monkward
