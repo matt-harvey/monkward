@@ -8,6 +8,23 @@ use Monkward\MonkwardException;
 
 final readonly class Arguments
 {
+    /** @var array<string, string> option => value key */
+    private const VALUE_OPTIONS = [
+        '--theme' => 'theme',
+        '--port' => 'port',
+        '--host' => 'host',
+    ];
+
+    /** @var array<string, string> flag => flag key */
+    private const FLAG_OPTIONS = [
+        '-h' => 'help',
+        '--help' => 'help',
+        '-V' => 'version',
+        '--version' => 'version',
+        '--init' => 'init',
+        '--open' => 'open',
+    ];
+
     public function __construct(
         public ?string $theme = null,
         public ?int $port = null,
@@ -22,13 +39,9 @@ final readonly class Arguments
 
     public static function parse(array $argv): self
     {
-        $theme = null;
-        $port = null;
-        $host = null;
-        $open = false;
-        $help = false;
-        $version = false;
-        $init = false;
+        /** @var array{theme: ?string, port: ?int, host: ?string} $values */
+        $values = ['theme' => null, 'port' => null, 'host' => null];
+        $flags = ['open' => false, 'help' => false, 'version' => false, 'init' => false];
         $path = null;
         $positionalOnly = false;
 
@@ -48,53 +61,17 @@ final readonly class Arguments
                 continue;
             }
 
-            if ($arg === '-h' || $arg === '--help') {
-                $help = true;
+            if (isset(self::FLAG_OPTIONS[$arg])) {
+                $flags[self::FLAG_OPTIONS[$arg]] = true;
                 continue;
             }
 
-            if ($arg === '-V' || $arg === '--version') {
-                $version = true;
-                continue;
-            }
-
-            if ($arg === '--init') {
-                $init = true;
-                continue;
-            }
-
-            if ($arg === '--open') {
-                $open = true;
-                continue;
-            }
-
-            if (\str_starts_with($arg, '--theme=')) {
-                $theme = self::requiredValue('--theme', \substr($arg, 8));
-                continue;
-            }
-            if ($arg === '--theme') {
-                $theme = self::requiredValue('--theme', self::nextValue($args, $i));
-                $i++;
-                continue;
-            }
-
-            if (\str_starts_with($arg, '--port=')) {
-                $port = self::parsePort('--port', \substr($arg, 7));
-                continue;
-            }
-            if ($arg === '--port') {
-                $port = self::parsePort('--port', self::nextValue($args, $i));
-                $i++;
-                continue;
-            }
-
-            if (\str_starts_with($arg, '--host=')) {
-                $host = self::requiredValue('--host', \substr($arg, 7));
-                continue;
-            }
-            if ($arg === '--host') {
-                $host = self::requiredValue('--host', self::nextValue($args, $i));
-                $i++;
+            $match = self::matchValueOption($arg, $args, $i);
+            if ($match !== null) {
+                $i += $match['consumedExtra'] ? 1 : 0;
+                $values[$match['key']] = $match['key'] === 'port'
+                    ? self::parsePort($match['option'], $match['value'])
+                    : self::requiredValue($match['option'], $match['value']);
                 continue;
             }
 
@@ -106,15 +83,47 @@ final readonly class Arguments
         }
 
         return new self(
-            theme: $theme,
-            port: $port,
-            host: $host,
-            open: $open,
-            help: $help,
-            version: $version,
-            init: $init,
+            theme: $values['theme'],
+            port: $values['port'],
+            host: $values['host'],
+            open: $flags['open'],
+            help: $flags['help'],
+            version: $flags['version'],
+            init: $flags['init'],
             path: $path,
         );
+    }
+
+    /**
+     * Matches a value-taking option in either `--option=value` or `--option value` form.
+     *
+     * @param list<string> $args
+     * @return array{option: string, key: string, value: string, consumedExtra: bool}|null
+     */
+    private static function matchValueOption(string $arg, array $args, int $index): ?array
+    {
+        foreach (self::VALUE_OPTIONS as $option => $key) {
+            if ($arg === $option) {
+                return [
+                    'option' => $option,
+                    'key' => $key,
+                    'value' => self::nextValue($args, $index),
+                    'consumedExtra' => true,
+                ];
+            }
+
+            $prefix = $option . '=';
+            if (\str_starts_with($arg, $prefix)) {
+                return [
+                    'option' => $option,
+                    'key' => $key,
+                    'value' => \substr($arg, \strlen($prefix)),
+                    'consumedExtra' => false,
+                ];
+            }
+        }
+
+        return null;
     }
 
     private static function setPath(string $value, ?string &$path): void
