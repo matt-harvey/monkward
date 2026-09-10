@@ -1,5 +1,5 @@
 {
-    "name": "monkward/monkward",
+    "name": "matt-harvey/monkward",
     "description": "An on-the-fly Markdown viewer served over localhost, installable as a PHAR.",
     "type": "library",
     "license": "MIT",

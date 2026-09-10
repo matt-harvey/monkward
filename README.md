@@ -31,13 +31,13 @@ make install
 Or install it globally as a Composer package:
 
 ```bash
-composer global require monkward/monkward
+composer global require matt-harvey/monkward
 monkward
 ```
 
 (If Composer's global `bin` directory is not on your `PATH`, Composer will say so;
 add it and you're set.) For a single project, use
-`composer require --dev monkward/monkward` and run `vendor/bin/monkward`.
+`composer require --dev matt-harvey/monkward` and run `vendor/bin/monkward`.
 
 ## Usage
 
