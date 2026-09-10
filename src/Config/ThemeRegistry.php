@@ -30,7 +30,7 @@ final class ThemeRegistry
         }
 
         $list = \array_keys($names);
-        \usort($list, static fn (string $a, string $b): int => \strnatcasecmp($a, $b));
+        \usort($list, static fn(string $a, string $b): int => \strnatcasecmp($a, $b));
 
         return $list;
     }
@@ -78,7 +78,7 @@ final class ThemeRegistry
             }
         }
 
-        \usort($names, static fn (string $a, string $b): int => \strnatcasecmp($a, $b));
+        \usort($names, static fn(string $a, string $b): int => \strnatcasecmp($a, $b));
 
         return $names;
     }

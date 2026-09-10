@@ -18,8 +18,7 @@ final class MonkwardRendererFactory implements RendererFactoryInterface
 {
     public function __construct(
         private RendererFactory $inner,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function createRenderer(

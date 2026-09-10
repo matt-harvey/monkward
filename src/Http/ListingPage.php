@@ -14,8 +14,7 @@ final class ListingPage
         private ?string $singleFile,
         private DirectoryLister $lister,
         private DocPage $docPage,
-    ) {
-    }
+    ) {}
 
     /** @return array{single: bool, view: array|null, rootName: string, relDir: string, breadcrumbs: array, dirs: array, files: array} */
     public function data(string $relativeDir): array

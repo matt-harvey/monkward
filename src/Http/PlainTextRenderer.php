@@ -10,8 +10,7 @@ final class PlainTextRenderer implements RendererInterface
 {
     public function __construct(
         private string $content,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function render(): string

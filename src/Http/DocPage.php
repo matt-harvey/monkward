@@ -15,8 +15,7 @@ final class DocPage
         private ?string $singleFile,
         private MarkdownRenderer $markdown,
         private DirectoryLister $lister,
-    ) {
-    }
+    ) {}
 
     /** @return array{title: string, rel: string, html: string, crumbs: list<array{label: string, href: string}>} */
     public function render(string $relative): array

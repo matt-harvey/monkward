@@ -34,8 +34,7 @@ final readonly class Arguments
         public bool $version = false,
         public bool $init = false,
         public ?string $path = null,
-    ) {
-    }
+    ) {}
 
     public static function parse(array $argv): self
     {

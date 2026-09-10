@@ -17,8 +17,7 @@ final readonly class UserConfig
         public ?int $port = null,
         public ?string $host = null,
         public bool $headingIds = true,
-    ) {
-    }
+    ) {}
 
     public static function load(): self
     {

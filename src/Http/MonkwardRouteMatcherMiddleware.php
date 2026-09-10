@@ -19,8 +19,7 @@ final readonly class MonkwardRouteMatcherMiddleware implements MiddlewareInterfa
 {
     public function __construct(
         private AssetResponder $assets,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function process(

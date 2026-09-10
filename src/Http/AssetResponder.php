@@ -16,8 +16,7 @@ final class AssetResponder
     public function __construct(
         private ThemeRegistry $themes,
         private string $defaultTheme,
-    ) {
-    }
+    ) {}
 
     public function isAsset(string $file): bool
     {

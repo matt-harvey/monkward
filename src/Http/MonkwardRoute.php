@@ -15,8 +15,7 @@ final readonly class MonkwardRoute
         public string $template,
         public ?string $relativePath = null,
         public ?string $assetName = null,
-    ) {
-    }
+    ) {}
 
     public static function listing(string $relativeDir): self
     {

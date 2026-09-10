@@ -22,41 +22,41 @@ final class MonkwardProvider implements ProviderInterface
     public static function factories(EnvironmentInterface $environment): array
     {
         return [
-            'monkward.target' => static fn (): string => \getenv('MONKWARD_TARGET') ?: '',
-            'monkward.single-file' => static fn (): ?string => \getenv('MONKWARD_SINGLE_FILE') ?: null,
-            'monkward.default-theme' => static fn (): string => \getenv('MONKWARD_DEFAULT_THEME') ?: UserConfig::DEFAULT_THEME,
-            'monkward.heading-ids' => static fn (): bool => self::decodeBool(\getenv('MONKWARD_HEADING_IDS'), true),
+            'monkward.target' => static fn(): string => \getenv('MONKWARD_TARGET') ?: '',
+            'monkward.single-file' => static fn(): ?string => \getenv('MONKWARD_SINGLE_FILE') ?: null,
+            'monkward.default-theme' => static fn(): string => \getenv('MONKWARD_DEFAULT_THEME') ?: UserConfig::DEFAULT_THEME,
+            'monkward.heading-ids' => static fn(): bool => self::decodeBool(\getenv('MONKWARD_HEADING_IDS'), true),
 
-            ThemeRegistry::class => static fn (): ThemeRegistry => new ThemeRegistry(),
+            ThemeRegistry::class => static fn(): ThemeRegistry => new ThemeRegistry(),
 
-            MarkdownRenderer::class => static fn (Container $c): MarkdownRenderer => new MarkdownRenderer(
+            MarkdownRenderer::class => static fn(Container $c): MarkdownRenderer => new MarkdownRenderer(
                 headingIds: $c->get('monkward.heading-ids'),
             ),
 
-            DirectoryLister::class => static fn (Container $c): DirectoryLister => new DirectoryLister(
+            DirectoryLister::class => static fn(Container $c): DirectoryLister => new DirectoryLister(
                 root: $c->get('monkward.target'),
             ),
 
-            DocPage::class => static fn (Container $c): DocPage => new DocPage(
+            DocPage::class => static fn(Container $c): DocPage => new DocPage(
                 root: $c->get('monkward.target'),
                 singleFile: $c->get('monkward.single-file'),
                 markdown: $c->get(MarkdownRenderer::class),
                 lister: $c->get(DirectoryLister::class),
             ),
 
-            ListingPage::class => static fn (Container $c): ListingPage => new ListingPage(
+            ListingPage::class => static fn(Container $c): ListingPage => new ListingPage(
                 root: $c->get('monkward.target'),
                 singleFile: $c->get('monkward.single-file'),
                 lister: $c->get(DirectoryLister::class),
                 docPage: $c->get(DocPage::class),
             ),
 
-            AssetResponder::class => static fn (Container $c): AssetResponder => new AssetResponder(
+            AssetResponder::class => static fn(Container $c): AssetResponder => new AssetResponder(
                 themes: $c->get(ThemeRegistry::class),
                 defaultTheme: $c->get('monkward.default-theme'),
             ),
 
-            RendererFactoryInterface::class => static fn (Container $c): MonkwardRendererFactory => new MonkwardRendererFactory(
+            RendererFactoryInterface::class => static fn(Container $c): MonkwardRendererFactory => new MonkwardRendererFactory(
                 new RendererFactory(
                     templateRoot: $c->get('substance.template-root'),
                     htmlEncoding: $c->get('substance.html-encoding'),
@@ -64,11 +64,11 @@ final class MonkwardProvider implements ProviderInterface
                 ),
             ),
 
-            MonkwardRouteMatcherMiddleware::class => static fn (Container $c): MonkwardRouteMatcherMiddleware => new MonkwardRouteMatcherMiddleware(
+            MonkwardRouteMatcherMiddleware::class => static fn(Container $c): MonkwardRouteMatcherMiddleware => new MonkwardRouteMatcherMiddleware(
                 assets: $c->get(AssetResponder::class),
             ),
 
-            MonkwardRouteActorMiddleware::class => static fn (Container $c): MonkwardRouteActorMiddleware => new MonkwardRouteActorMiddleware(
+            MonkwardRouteActorMiddleware::class => static fn(Container $c): MonkwardRouteActorMiddleware => new MonkwardRouteActorMiddleware(
                 container: $c,
                 contextFactory: $c->get(ContextFactoryInterface::class),
                 rendererFactory: $c->get(RendererFactoryInterface::class),

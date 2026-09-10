@@ -8,8 +8,7 @@ final class DirectoryLister
 {
     public function __construct(
         private string $root,
-    ) {
-    }
+    ) {}
 
     public function resolveDir(string $relativeDir): ?string
     {
@@ -88,7 +87,7 @@ final class DirectoryLister
             }
         }
 
-        \usort($dirs, static fn (array $a, array $b): int => \strnatcasecmp($a['name'], $b['name']));
+        \usort($dirs, static fn(array $a, array $b): int => \strnatcasecmp($a['name'], $b['name']));
         \usort($files, static function (array $a, array $b): int {
             if ($a['md'] !== $b['md']) {
                 return $a['md'] ? -1 : 1;

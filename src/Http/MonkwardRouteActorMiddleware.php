@@ -28,8 +28,7 @@ final readonly class MonkwardRouteActorMiddleware implements MiddlewareInterface
         private ContextFactoryInterface $contextFactory,
         private RendererFactoryInterface $rendererFactory,
         private ResponseFactoryInterface $responseFactory,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function process(
@@ -45,13 +44,13 @@ final readonly class MonkwardRouteActorMiddleware implements MiddlewareInterface
 
         $responseData = match ($route->kind) {
             MonkwardRoute::KIND_LISTING => $context->run(
-                static fn (ListingPage $listingPage): array => $listingPage->data($route->relativePath ?? ''),
+                static fn(ListingPage $listingPage): array => $listingPage->data($route->relativePath ?? ''),
             ),
             MonkwardRoute::KIND_DOC => $context->run(
-                static fn (DocPage $docPage): array => $docPage->render($route->relativePath ?? ''),
+                static fn(DocPage $docPage): array => $docPage->render($route->relativePath ?? ''),
             ),
             MonkwardRoute::KIND_ASSET => $context->run(
-                static fn (AssetResponder $assets, Respond $respond, QueryParams $query): mixed
+                static fn(AssetResponder $assets, Respond $respond, QueryParams $query): mixed
                     => $assets->respond($route->assetName ?? '', $respond, $query),
             ),
             default => throw new RoutingException('Unhandled route kind: ' . $route->kind),
