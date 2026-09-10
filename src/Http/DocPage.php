@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Monkward\Http;
 
 use Monkward\Markdown\MarkdownRenderer;
+use Monkward\Site\Breadcrumb;
 use Monkward\Site\DirectoryLister;
 use SubstancePHP\HTTP\Exception\BaseException\UserError;
 
@@ -16,14 +17,7 @@ final class DocPage
         private DirectoryLister $lister,
     ) {}
 
-    /**
-     * @return array{
-     *     title: string,
-     *     rel: string,
-     *     html: string,
-     *     crumbs: list<array{label: string, href: string}>
-     * }
-     */
+    /** @return array{title: string, rel: string, html: string, crumbs: list<Breadcrumb>} */
     public function render(string $relative): array
     {
         $relative = \str_replace('\\', '/', $relative);
@@ -54,7 +48,7 @@ final class DocPage
         ];
     }
 
-    /** @return list<array{label: string, href: string}> */
+    /** @return list<Breadcrumb> */
     private function breadcrumbs(string $relative): array
     {
         $dir = \dirname($relative);
@@ -66,10 +60,7 @@ final class DocPage
         $prefix = '';
         foreach (\explode('/', $dir) as $part) {
             $prefix = $prefix === '' ? $part : $prefix . '/' . $part;
-            $crumbs[] = [
-                'label' => $part,
-                'href' => '/' . DirectoryLister::encodePath($prefix) . '/',
-            ];
+            $crumbs[] = new Breadcrumb($part, '/' . DirectoryLister::encodePath($prefix) . '/');
         }
 
         return $crumbs;

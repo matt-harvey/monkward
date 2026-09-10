@@ -47,13 +47,8 @@ final class DirectoryLister
     /**
      * Lists one level of a directory: directories first, then markdown files,
      * then everything else.
-     *
-     * @return array{
-     *     dirs: list<array{name: string, href: string}>,
-     *     files: list<array{name: string, md: bool, href: ?string}>
-     * }
      */
-    public function list(string $relativeDir): array
+    public function list(string $relativeDir): DirectoryListing
     {
         $abs = $this->resolveDir($relativeDir);
         if ($abs === null) {
@@ -76,29 +71,25 @@ final class DirectoryLister
             $rel = $relativeDir === '' ? $name : $relativeDir . '/' . $name;
 
             if (\is_dir($path)) {
-                $dirs[] = ['name' => $name, 'href' => '/' . self::encodePath($rel) . '/'];
+                $dirs[] = new DirEntry($name, '/' . self::encodePath($rel) . '/');
                 continue;
             }
 
             if (\is_file($path) || \is_link($path)) {
                 $md = \strtolower(\pathinfo($name, \PATHINFO_EXTENSION)) === 'md';
-                $files[] = [
-                    'name' => $name,
-                    'md' => $md,
-                    'href' => $md ? '/' . self::encodePath($rel) : null,
-                ];
+                $files[] = new FileEntry($name, $md, $md ? '/' . self::encodePath($rel) : null);
             }
         }
 
-        \usort($dirs, static fn(array $a, array $b): int => \strnatcasecmp($a['name'], $b['name']));
-        \usort($files, static function (array $a, array $b): int {
-            if ($a['md'] !== $b['md']) {
-                return $a['md'] ? -1 : 1;
+        \usort($dirs, static fn(DirEntry $a, DirEntry $b): int => \strnatcasecmp($a->name, $b->name));
+        \usort($files, static function (FileEntry $a, FileEntry $b): int {
+            if ($a->md !== $b->md) {
+                return $a->md ? -1 : 1;
             }
-            return \strnatcasecmp($a['name'], $b['name']);
+            return \strnatcasecmp($a->name, $b->name);
         });
 
-        return ['dirs' => $dirs, 'files' => $files];
+        return new DirectoryListing($dirs, $files);
     }
 
     public static function encodePath(string $path): string

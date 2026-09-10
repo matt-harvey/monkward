@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Monkward\Http;
 
+use Monkward\Site\Breadcrumb;
+use Monkward\Site\DirEntry;
 use Monkward\Site\DirectoryLister;
+use Monkward\Site\FileEntry;
 use SubstancePHP\HTTP\Exception\BaseException\UserError;
 
 final class ListingPage
@@ -23,13 +26,13 @@ final class ListingPage
      *         title: string,
      *         rel: string,
      *         html: string,
-     *         crumbs: list<array{label: string, href: string}>
+     *         crumbs: list<Breadcrumb>
      *     }|null,
      *     rootName: string,
      *     relDir: string,
-     *     breadcrumbs: list<array{label: string, href: string}>,
-     *     dirs: list<array{name: string, href: string}>,
-     *     files: list<array{name: string, md: bool, href: ?string}>
+     *     breadcrumbs: list<Breadcrumb>,
+     *     dirs: list<DirEntry>,
+     *     files: list<FileEntry>
      * }
      */
     public function data(string $relativeDir): array
@@ -64,12 +67,12 @@ final class ListingPage
                 : \basename($relativeDir),
             'relDir' => $relativeDir,
             'breadcrumbs' => $this->breadcrumbs($relativeDir),
-            'dirs' => $listing['dirs'],
-            'files' => $listing['files'],
+            'dirs' => $listing->dirs,
+            'files' => $listing->files,
         ];
     }
 
-    /** @return list<array{label: string, href: string}> */
+    /** @return list<Breadcrumb> */
     private function breadcrumbs(string $relativeDir): array
     {
         if ($relativeDir === '') {
@@ -80,10 +83,7 @@ final class ListingPage
         $prefix = '';
         foreach (\explode('/', $relativeDir) as $part) {
             $prefix = $prefix === '' ? $part : $prefix . '/' . $part;
-            $crumbs[] = [
-                'label' => $part,
-                'href' => '/' . DirectoryLister::encodePath($prefix) . '/',
-            ];
+            $crumbs[] = new Breadcrumb($part, '/' . DirectoryLister::encodePath($prefix) . '/');
         }
 
         return $crumbs;

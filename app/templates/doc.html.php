@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
+use Monkward\Site\Breadcrumb;
 use SubstancePHP\HTTP\Renderer\HtmlRenderer;
 
 /** @var HtmlRenderer $this */
 /** @var string $title */
 /** @var string $rel */
 /** @var string $html */
-/** @var list<array{label: string, href: string}> $crumbs */
+/** @var list<Breadcrumb> $crumbs */
 ?>
 
 <?php $this->layout('layout', ['title' => $title]); ?>
@@ -17,7 +18,7 @@ use SubstancePHP\HTTP\Renderer\HtmlRenderer;
     <a class="crumb" href="/">index</a>
     <?php foreach ($crumbs as $crumb): ?>
         <span class="crumb-sep">/</span>
-        <a class="crumb" href="<?= $this->a($crumb['href']) ?>"><?= $this->h($crumb['label']) ?></a>
+        <a class="crumb" href="<?= $this->a($crumb->href) ?>"><?= $this->h($crumb->label) ?></a>
     <?php endforeach; ?>
 <?php $this->stop(); ?>
 

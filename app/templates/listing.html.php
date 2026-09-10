@@ -2,16 +2,19 @@
 
 declare(strict_types=1);
 
+use Monkward\Site\Breadcrumb;
+use Monkward\Site\DirEntry;
+use Monkward\Site\FileEntry;
 use SubstancePHP\HTTP\Renderer\HtmlRenderer;
 
 /** @var HtmlRenderer $this */
 /** @var bool $single */
-/** @var array{title: string, rel: string, html: string, crumbs: list<array{label: string, href: string}>}|null $view */
+/** @var array{title: string, rel: string, html: string, crumbs: list<Breadcrumb>}|null $view */
 /** @var string $rootName */
 /** @var string $relDir */
-/** @var list<array{label: string, href: string}> $breadcrumbs */
-/** @var list<array{name: string, href: string}> $dirs */
-/** @var list<array{name: string, md: bool, href: ?string}> $files */
+/** @var list<Breadcrumb> $breadcrumbs */
+/** @var list<DirEntry> $dirs */
+/** @var list<FileEntry> $files */
 ?>
 
 <?php
@@ -25,7 +28,7 @@ if ($single) {
     <a class="crumb" href="/">index</a>
     <?php foreach ($breadcrumbs as $crumb): ?>
         <span class="crumb-sep">/</span>
-        <a class="crumb" href="<?= $this->a($crumb['href']) ?>"><?= $this->h($crumb['label']) ?></a>
+        <a class="crumb" href="<?= $this->a($crumb->href) ?>"><?= $this->h($crumb->label) ?></a>
     <?php endforeach; ?>
 <?php
     $this->stop();
@@ -46,19 +49,19 @@ if ($single) {
             <?php foreach ($dirs as $dir): ?>
                 <li class="tree-dir">
                     <a class="dir-link"
-                        href="<?= $this->a($dir['href']) ?>"
-                    ><?= $this->h($dir['name']) ?>/</a>
+                        href="<?= $this->a($dir->href) ?>"
+                    ><?= $this->h($dir->name) ?>/</a>
                 </li>
             <?php endforeach; ?>
             <?php foreach ($files as $file): ?>
-                <?php if ($file['md']): ?>
+                <?php if ($file->md): ?>
                     <li class="tree-file">
                         <a class="md-link"
-                            href="<?= $this->a($file['href']) ?>"
-                        ><?= $this->h($file['name']) ?></a>
+                            href="<?= $this->a($file->href) ?>"
+                        ><?= $this->h($file->name) ?></a>
                     </li>
                 <?php else: ?>
-                    <li class="tree-file plain"><span><?= $this->h($file['name']) ?></span></li>
+                    <li class="tree-file plain"><span><?= $this->h($file->name) ?></span></li>
                 <?php endif; ?>
             <?php endforeach; ?>
         </ul>

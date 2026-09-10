@@ -41,15 +41,15 @@ final class DirectoryListerTest extends TestCase
 
         self::assertSame(
             ['docs', 'empty', 'node_modules', 'vendor'],
-            \array_column($listing['dirs'], 'name'),
+            \array_column($listing->dirs, 'name'),
         );
-        self::assertSame(['hello.md', '.env', 'notes.txt'], \array_column($listing['files'], 'name'));
+        self::assertSame(['hello.md', '.env', 'notes.txt'], \array_column($listing->files, 'name'));
 
-        self::assertSame('/docs/', $listing['dirs'][0]['href']);
-        self::assertSame('/hello.md', $listing['files'][0]['href']);
-        self::assertTrue($listing['files'][0]['md']);
-        self::assertFalse($listing['files'][1]['md']);
-        self::assertNull($listing['files'][1]['href']);
+        self::assertSame('/docs/', $listing->dirs[0]->href);
+        self::assertSame('/hello.md', $listing->files[0]->href);
+        self::assertTrue($listing->files[0]->md);
+        self::assertFalse($listing->files[1]->md);
+        self::assertNull($listing->files[1]->href);
     }
 
     #[Test]
@@ -58,12 +58,12 @@ final class DirectoryListerTest extends TestCase
         $lister = new DirectoryLister($this->root);
 
         $docs = $lister->list('docs');
-        self::assertSame([], $docs['dirs']);
-        self::assertSame(['guide.md'], \array_column($docs['files'], 'name'));
+        self::assertSame([], $docs->dirs);
+        self::assertSame(['guide.md'], \array_column($docs->files, 'name'));
 
         $empty = $lister->list('empty');
-        self::assertSame([], $empty['dirs']);
-        self::assertSame([], $empty['files']);
+        self::assertSame([], $empty->dirs);
+        self::assertSame([], $empty->files);
     }
 
     #[Test]
