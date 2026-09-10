@@ -19,6 +19,7 @@
   --quote-border: #0f766e;
   --quote-bg: #f2f7f5;
   --link: #0f766e;
+  --shadow: 0 2px 8px rgba(43, 52, 64, 0.10), 0 8px 24px rgba(43, 52, 64, 0.08);
 }
 
 * {
@@ -97,6 +98,7 @@ a:hover {
 }
 
 .theme-picker {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -106,17 +108,67 @@ a:hover {
 }
 
 .theme-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   background: var(--surface);
   color: var(--ink);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.25rem 0.5rem;
   font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
 }
 
-.theme-select,
-.theme-select option {
+.theme-caret {
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+}
+
+.theme-menu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  z-index: 20;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  min-width: 10rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+.theme-menu[hidden] {
+  display: none;
+}
+
+.theme-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.35rem 0.6rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-family: inherit;
   cursor: pointer;
+}
+
+.theme-option:hover,
+.theme-option:focus-visible {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  outline: none;
+}
+
+.theme-option[aria-selected="true"] {
+  color: var(--accent-strong);
+  font-weight: 600;
 }
 
 .site-main {
