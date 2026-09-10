@@ -9,7 +9,7 @@ final class ConfigInstaller
     /**
      * Materializes monkward's configuration in ~/.config/monkward (or
      * $XDG_CONFIG_HOME/monkward): a config.toml with the prebaked defaults and
-     * a copy of the default theme so it can be edited. Existing files are
+     * copies of the built-in themes so they can be edited. Existing files are
      * never overwritten.
      *
      * @return list<string> paths that were created
@@ -42,12 +42,16 @@ final class ConfigInstaller
             $created[] = $configFile;
         }
 
-        $userTheme = "{$themesDir}/default.css";
-        if (! \is_file($userTheme)) {
-            $builtIn = ThemeManager::builtInDefaultThemePath();
+        foreach (ThemeRegistry::builtInThemes() as $name) {
+            $userTheme = "{$themesDir}/{$name}.css";
+            if (\is_file($userTheme)) {
+                continue;
+            }
+
+            $builtIn = ThemeRegistry::builtInThemesDir() . "/{$name}.css";
             $css = @\file_get_contents($builtIn);
             if ($css === false || @\file_put_contents($userTheme, $css) === false) {
-                throw new \RuntimeException("could not install default theme to {$userTheme}");
+                throw new \RuntimeException("could not install theme {$name} to {$userTheme}");
             }
             $created[] = $userTheme;
         }
@@ -61,7 +65,7 @@ final class ConfigInstaller
 # monkward configuration
 # Edit these defaults to taste; run `monkward --help` for details.
 
-theme = "default"
+theme = "light"
 port = 8800
 host = "127.0.0.1"
 

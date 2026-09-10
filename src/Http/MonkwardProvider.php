@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Monkward\Http;
 
+use Monkward\Config\ThemeRegistry;
+use Monkward\Config\UserConfig;
 use Monkward\Markdown\MarkdownRenderer;
 use Monkward\Site\DirectoryLister;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -24,8 +26,10 @@ final class MonkwardProvider implements ProviderInterface
         return [
             'monkward.target' => static fn (): string => \getenv('MONKWARD_TARGET') ?: '',
             'monkward.single-file' => static fn (): ?string => \getenv('MONKWARD_SINGLE_FILE') ?: null,
-            'monkward.theme-css-path' => static fn (): string => \getenv('MONKWARD_THEME_CSS_PATH') ?: '',
+            'monkward.default-theme' => static fn (): string => \getenv('MONKWARD_DEFAULT_THEME') ?: UserConfig::DEFAULT_THEME,
             'monkward.heading-ids' => static fn (): bool => self::decodeBool(\getenv('MONKWARD_HEADING_IDS'), true),
+
+            ThemeRegistry::class => static fn (): ThemeRegistry => new ThemeRegistry(),
 
             MarkdownRenderer::class => static fn (Container $c): MarkdownRenderer => new MarkdownRenderer(
                 headingIds: $c->get('monkward.heading-ids'),
@@ -50,7 +54,8 @@ final class MonkwardProvider implements ProviderInterface
             ),
 
             AssetResponder::class => static fn (Container $c): AssetResponder => new AssetResponder(
-                themeCssPath: $c->get('monkward.theme-css-path'),
+                themes: $c->get(ThemeRegistry::class),
+                defaultTheme: $c->get('monkward.default-theme'),
             ),
 
             RendererFactoryInterface::class => static fn (Container $c): MonkwardRendererFactory => new MonkwardRendererFactory(

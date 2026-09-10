@@ -29,6 +29,7 @@ final class MonkwardRendererFactory implements RendererFactoryInterface
     ): RendererInterface {
         if (\str_starts_with($responseContentType, 'text/css')
             || \str_starts_with($responseContentType, 'image/svg+xml')
+            || \str_starts_with($responseContentType, 'application/json')
         ) {
             return new PlainTextRenderer((string) $responseData);
         }

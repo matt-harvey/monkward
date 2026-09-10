@@ -23,7 +23,7 @@ make install
 `make install` builds a PHAR and drops it in `~/.local/bin`
 (override with `make install PREFIX=/somewhere`), so `monkward` is on your
 `PATH` immediately. It also initializes `~/.config/monkward/` with an editable
-`config.toml` and `themes/default.css`.
+`config.toml` and the built-in `light.css` / `dark.css` themes.
 
 ## Usage
 
@@ -63,21 +63,24 @@ Installing monkward sets up `~/.config/monkward/` for you:
 ~/.config/monkward/
 ├── config.toml
 └── themes/
-    └── default.css
+    ├── light.css
+    └── dark.css
 ```
 
 `config.toml` starts with the prebaked defaults. You can edit it freely:
 
 ```toml
-theme = "default"
+theme = "light"
 port = 8800
 host = "127.0.0.1"
 heading_ids = true
 ```
 
-`themes/default.css` is the default theme, copied there so you can see and
-tweak it. Add your own stylesheets next to it (`yeah.css`, etc.) and point
-`theme` at one; or pass `--theme=yeah` for a single run. Command-line flags
+`light.css` and `dark.css` are copied there so you can see and tweak them.
+Drop any other stylesheet next to them (`yeah.css`, etc.) and it shows up in
+the theme dropdown at the top of every page. The dropdown choice is remembered
+in your browser; `theme` in `config.toml` (or `--theme=yeah` for a single run)
+just picks the default when nothing has been chosen yet. Command-line flags
 override the config file.
 
 `heading_ids = true` adds `id="..."` attributes to rendered headings so

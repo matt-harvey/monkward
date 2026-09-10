@@ -13,6 +13,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use SubstancePHP\HTTP\ContextFactoryInterface;
 use SubstancePHP\HTTP\Exception\BaseException\RoutingException;
 use SubstancePHP\HTTP\RendererFactoryInterface;
+use SubstancePHP\HTTP\RequestParams\QueryParams;
 use SubstancePHP\HTTP\Respond;
 
 /**
@@ -50,8 +51,8 @@ final readonly class MonkwardRouteActorMiddleware implements MiddlewareInterface
                 static fn (DocPage $docPage): array => $docPage->render($route->relativePath ?? ''),
             ),
             MonkwardRoute::KIND_ASSET => $context->run(
-                static fn (AssetResponder $assets, Respond $respond): mixed
-                    => $assets->respond($route->assetName ?? '', $respond),
+                static fn (AssetResponder $assets, Respond $respond, QueryParams $query): mixed
+                    => $assets->respond($route->assetName ?? '', $respond, $query),
             ),
             default => throw new RoutingException('Unhandled route kind: ' . $route->kind),
         };

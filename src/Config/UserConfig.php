@@ -8,7 +8,7 @@ use Monkward\MonkwardException;
 
 final readonly class UserConfig
 {
-    public const DEFAULT_THEME = 'default';
+    public const DEFAULT_THEME = 'light';
     public const DEFAULT_PORT = 8800;
     public const DEFAULT_HOST = '127.0.0.1';
 

@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Monkward\Console;
 
 use Monkward\Config\ConfigInstaller;
-use Monkward\Config\Theme;
-use Monkward\Config\ThemeManager;
+use Monkward\Config\ThemeRegistry;
 use Monkward\Config\UserConfig;
 use Monkward\MonkwardException;
 use Monkward\Version;
@@ -49,12 +48,19 @@ final class Application
 
             $config = UserConfig::load();
 
-            $themeName = $args->theme ?? $config->theme;
+            $themeName = $args->theme ?? $config->theme ?? UserConfig::DEFAULT_THEME;
             $port = $args->port ?? $config->port ?? UserConfig::DEFAULT_PORT;
             $host = $args->host ?? $config->host ?? UserConfig::DEFAULT_HOST;
             $headingIds = $config->headingIds;
 
-            $theme = (new ThemeManager())->resolve($themeName, strict: $args->theme !== null);
+            $registry = new ThemeRegistry();
+            if ($registry->resolvePath($themeName) === null) {
+                if ($args->theme !== null) {
+                    throw new MonkwardException("theme '{$themeName}' not found");
+                }
+                $this->stderr("monkward: warning: theme '{$themeName}' not found; falling back to '" . UserConfig::DEFAULT_THEME . "'");
+                $themeName = UserConfig::DEFAULT_THEME;
+            }
 
             [$target, $singleFile] = $this->resolveTarget($args->path);
 
@@ -63,7 +69,7 @@ final class Application
             $this->registerSignalHandlers();
 
             $url = \sprintf('http://%s:%d', $host, $port);
-            $this->startServer($host, $port, $this->routerPath(), $target, $singleFile, $theme->path, $headingIds);
+            $this->startServer($host, $port, $this->routerPath(), $target, $singleFile, $themeName, $headingIds);
 
             $this->stdout(\sprintf('monkward %s serving %s at %s', Version::VERSION, $target, $url));
             $this->stdout('Press Ctrl+C to stop.');
@@ -163,7 +169,7 @@ final class Application
         string $router,
         string $target,
         ?string $singleFile,
-        string $themeCssPath,
+        string $defaultTheme,
         bool $headingIds,
     ): void {
         $command = [
@@ -178,7 +184,7 @@ final class Application
         $env = \array_merge(\getenv(), [
             'MONKWARD_TARGET' => $target,
             'MONKWARD_SINGLE_FILE' => $singleFile ?? '',
-            'MONKWARD_THEME_CSS_PATH' => $themeCssPath,
+            'MONKWARD_DEFAULT_THEME' => $defaultTheme,
             'MONKWARD_HEADING_IDS' => $headingIds ? '1' : '0',
         ]);
 
@@ -430,11 +436,11 @@ Arguments:
                            Defaults to the current directory.
 
 Options:
-  --theme=NAME             Use ~/.config/monkward/themes/NAME.css
+  --theme=NAME             Use ~/.config/monkward/themes/NAME.css as the default theme
   --port=PORT              Port to serve on (default: 8800)
   --host=HOST              Host to bind (default: 127.0.0.1)
   --open                   Open the default browser at the served URL
-  --init                   Create ~/.config/monkward with config.toml and themes/default.css
+  --init                   Create ~/.config/monkward with config.toml and built-in themes
   -h, --help               Show this help
   -V, --version            Show the version
 
@@ -442,8 +448,10 @@ Configuration lives in ~/.config/monkward/config.toml (created on install or
 first run). Set `heading_ids = false` to stop adding id="..." attributes to
 headings.
 
-Theme stylesheets live in ~/.config/monkward/themes/ (e.g. yeah.css); the
-default theme is copied there as default.css so it can be edited.
+Theme stylesheets live in ~/.config/monkward/themes/ (light.css and dark.css
+are installed for you). `theme = "light"` in config.toml picks the default;
+every available theme is also a dropdown away in the page header, and the
+choice is remembered in your browser.
 HELP);
     }
 

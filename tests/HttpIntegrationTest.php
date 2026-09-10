@@ -89,7 +89,19 @@ final class HttpIntegrationTest extends TestCase
 
         [$cssStatus, $cssBody] = $this->get('/monkward-theme.css');
         self::assertSame(200, $cssStatus);
-        self::assertStringContainsString('monkward default theme', $cssBody);
+        self::assertStringContainsString('monkward light theme', $cssBody);
+
+        [$darkCssStatus, $darkCssBody] = $this->get('/monkward-theme.css?theme=dark');
+        self::assertSame(200, $darkCssStatus);
+        self::assertStringContainsString('monkward dark theme', $darkCssBody);
+
+        [$missingThemeStatus] = $this->get('/monkward-theme.css?theme=nope');
+        self::assertSame(404, $missingThemeStatus);
+
+        [$themesStatus, $themesBody] = $this->get('/monkward-themes.json');
+        self::assertSame(200, $themesStatus);
+        self::assertStringContainsString('"light"', $themesBody);
+        self::assertStringContainsString('"dark"', $themesBody);
 
         [$faviconStatus, $faviconBody] = $this->get('/favicon.svg');
         self::assertSame(200, $faviconStatus);
@@ -159,7 +171,7 @@ final class HttpIntegrationTest extends TestCase
         $env = \array_merge(\getenv(), [
             'MONKWARD_TARGET' => $this->target,
             'MONKWARD_SINGLE_FILE' => $singleFile ?? '',
-            'MONKWARD_THEME_CSS_PATH' => \dirname(__DIR__) . '/resources/themes/default.css',
+            'MONKWARD_DEFAULT_THEME' => 'light',
             'MONKWARD_HEADING_IDS' => '1',
         ], $extraEnv);
 

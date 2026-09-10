@@ -26,7 +26,7 @@ final class ConfigInstallerTest extends TestCase
     }
 
     #[Test]
-    public function ensureInstalledCreatesConfigAndDefaultTheme(): void
+    public function ensureInstalledCreatesConfigAndBuiltInThemes(): void
     {
         $created = (new ConfigInstaller())->ensureInstalled();
 
@@ -34,10 +34,12 @@ final class ConfigInstallerTest extends TestCase
         self::assertNotNull($configDir);
         self::assertContains($configDir, $created);
         self::assertContains($configDir . '/config.toml', $created);
-        self::assertContains($configDir . '/themes/default.css', $created);
+        self::assertContains($configDir . '/themes/light.css', $created);
+        self::assertContains($configDir . '/themes/dark.css', $created);
 
         self::assertFileExists($configDir . '/config.toml');
-        self::assertFileExists($configDir . '/themes/default.css');
+        self::assertFileExists($configDir . '/themes/light.css');
+        self::assertFileExists($configDir . '/themes/dark.css');
     }
 
     #[Test]
@@ -61,11 +63,12 @@ final class ConfigInstallerTest extends TestCase
     {
         $toml = (new ConfigInstaller())->defaultConfigToml();
 
-        self::assertStringContainsString('theme = "default"', $toml);
+        self::assertStringContainsString('theme = "light"', $toml);
         self::assertStringContainsString('heading_ids = true', $toml);
 
         $parsed = UserConfig::fromToml($toml);
         self::assertTrue($parsed->headingIds);
+        self::assertSame('light', $parsed->theme);
     }
 
     private function removeTree(string $dir): void
