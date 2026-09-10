@@ -33,6 +33,7 @@ final class HttpIntegrationTest extends TestCase
         \mkdir($this->workspace . '/docroot', 0777, true);
 
         \file_put_contents($this->target . '/hello.md', "# Hello\n\nworld");
+        \file_put_contents($this->target . '/notes.txt', 'plain root file');
         \file_put_contents($this->target . '/docs/guide.md', "# Guide\n\n- one\n- two");
         \file_put_contents($this->target . '/docs/deep/nested.md', "# Nested\n\n> deep");
         \file_put_contents($this->target . '/docs/notes.txt', 'not markdown');
@@ -49,21 +50,33 @@ final class HttpIntegrationTest extends TestCase
     }
 
     #[Test]
-    public function servesIndexDocumentsThemeAndFavicon(): void
+    public function servesShallowListingsDocumentsAssetsAnd404s(): void
     {
         $this->startServer();
 
+        // Root shows one level: all subdirs (except ignored), all file names.
         [$indexStatus, $indexBody] = $this->get('/');
         self::assertSame(200, $indexStatus);
         self::assertStringContainsString('monkward', $indexBody);
-        self::assertStringContainsString('>hello</a>', $indexBody);
         self::assertStringContainsString('docs/', $indexBody);
-        self::assertStringContainsString('>guide</a>', $indexBody);
-        self::assertStringNotContainsString('notes.txt', $indexBody);
-        self::assertStringNotContainsString('empty', $indexBody);
+        self::assertStringContainsString('empty/', $indexBody);
+        self::assertStringContainsString('>hello.md</a>', $indexBody);
+        self::assertStringContainsString('<span>notes.txt</span>', $indexBody);
         self::assertStringNotContainsString('vendor', $indexBody);
         self::assertStringNotContainsString('node_modules', $indexBody);
 
+        // Subdirectory listings go one level down.
+        [$docsStatus, $docsBody] = $this->get('/docs/');
+        self::assertSame(200, $docsStatus);
+        self::assertStringContainsString('deep/', $docsBody);
+        self::assertStringContainsString('>guide.md</a>', $docsBody);
+        self::assertStringContainsString('<span>notes.txt</span>', $docsBody);
+
+        [$deepStatus, $deepBody] = $this->get('/docs/deep/');
+        self::assertSame(200, $deepStatus);
+        self::assertStringContainsString('>nested.md</a>', $deepBody);
+
+        // Markdown documents still render at their full path.
         [$docStatus, $docBody] = $this->get('/hello.md');
         self::assertSame(200, $docStatus);
         self::assertStringContainsString('<h1 id="hello">Hello</h1>', $docBody);
@@ -85,14 +98,17 @@ final class HttpIntegrationTest extends TestCase
         [$missingStatus] = $this->get('/missing.md');
         self::assertSame(404, $missingStatus);
 
-        [$ignoredStatus] = $this->get('/vendor/bundle.md');
-        self::assertSame(404, $ignoredStatus);
+        [$ignoredDocStatus] = $this->get('/vendor/bundle.md');
+        self::assertSame(404, $ignoredDocStatus);
+
+        [$ignoredDirStatus] = $this->get('/vendor/');
+        self::assertSame(404, $ignoredDirStatus);
 
         [$nonMdStatus] = $this->get('/docs/notes.txt');
         self::assertSame(404, $nonMdStatus);
 
-        [$dirStatus] = $this->get('/docs/');
-        self::assertSame(404, $dirStatus);
+        [$fileAsDirStatus] = $this->get('/notes.txt');
+        self::assertSame(404, $fileAsDirStatus);
     }
 
     #[Test]
@@ -105,6 +121,10 @@ final class HttpIntegrationTest extends TestCase
         self::assertSame(200, $indexStatus);
         self::assertStringContainsString('vendor/', $indexBody);
         self::assertStringNotContainsString('node_modules', $indexBody);
+
+        [$dirStatus, $dirBody] = $this->get('/vendor/');
+        self::assertSame(200, $dirStatus);
+        self::assertStringContainsString('>bundle.md</a>', $dirBody);
 
         [$docStatus, $docBody] = $this->get('/vendor/bundle.md');
         self::assertSame(200, $docStatus);
@@ -135,6 +155,9 @@ final class HttpIntegrationTest extends TestCase
 
         [$otherStatus] = $this->get('/hello.md');
         self::assertSame(404, $otherStatus);
+
+        [$dirStatus] = $this->get('/docs/');
+        self::assertSame(404, $dirStatus);
     }
 
     private function startServer(?string $singleFile = null, array $extraEnv = []): void

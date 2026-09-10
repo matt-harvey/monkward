@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Monkward\Http;
 
 use Monkward\Markdown\MarkdownRenderer;
-use Monkward\Site\FileScanner;
+use Monkward\Site\DirectoryLister;
 use SubstancePHP\HTTP\Exception\BaseException\UserError;
 
 final class DocPage
@@ -14,11 +14,11 @@ final class DocPage
         private string $root,
         private ?string $singleFile,
         private MarkdownRenderer $markdown,
-        private FileScanner $scanner,
+        private DirectoryLister $lister,
     ) {
     }
 
-    /** @return array{title: string, rel: string, dir: string, html: string} */
+    /** @return array{title: string, rel: string, html: string, crumbs: list<array{label: string, href: string}>} */
     public function render(string $relative): array
     {
         $relative = \str_replace('\\', '/', $relative);
@@ -31,41 +31,46 @@ final class DocPage
             UserError::throw(404);
         }
 
-        if ($this->singleFile === null && $this->scanner->isIgnored($relative)) {
+        if ($this->singleFile === null && $this->lister->isIgnoredPath($relative)) {
             UserError::throw(404);
         }
 
-        $absolute = $this->resolve($relative);
+        $absolute = $this->lister->resolveFile($relative);
+        if ($absolute === null) {
+            UserError::throw(404);
+        }
+
         $markdown = @\file_get_contents($absolute);
         if ($markdown === false) {
             UserError::throw(404);
         }
 
-        $dir = \dirname($relative);
-
         return [
             'title' => \preg_replace('/\.md$/i', '', \basename($relative)) ?? \basename($relative),
             'rel' => $relative,
-            'dir' => $dir === '.' ? '' : $dir,
             'html' => $this->markdown->render($markdown),
+            'crumbs' => $this->breadcrumbs($relative),
         ];
     }
 
-    private function resolve(string $relative): string
+    /** @return list<array{label: string, href: string}> */
+    private function breadcrumbs(string $relative): array
     {
-        $rootReal = \realpath($this->root) ?: \rtrim($this->root, '/\\');
-        $candidate = \rtrim($rootReal, '/\\') . '/' . $relative;
-        $real = \realpath($candidate);
-
-        if ($real === false || ! \is_file($real)) {
-            UserError::throw(404);
+        $dir = \dirname($relative);
+        if ($dir === '.') {
+            return [];
         }
 
-        $prefix = \rtrim($rootReal, '/\\') . '/';
-        if (! \str_starts_with($real, $prefix)) {
-            UserError::throw(404);
+        $crumbs = [];
+        $prefix = '';
+        foreach (\explode('/', $dir) as $part) {
+            $prefix = $prefix === '' ? $part : $prefix . '/' . $part;
+            $crumbs[] = [
+                'label' => $part,
+                'href' => '/' . DirectoryLister::encodePath($prefix) . '/',
+            ];
         }
 
-        return $real;
+        return $crumbs;
     }
 }

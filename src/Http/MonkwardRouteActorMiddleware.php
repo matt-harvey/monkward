@@ -43,8 +43,8 @@ final readonly class MonkwardRouteActorMiddleware implements MiddlewareInterface
         $context = $this->contextFactory->createContext($this->container, $request);
 
         $responseData = match ($route->kind) {
-            MonkwardRoute::KIND_INDEX => $context->run(
-                static fn (IndexPage $indexPage): array => $indexPage->data(),
+            MonkwardRoute::KIND_LISTING => $context->run(
+                static fn (ListingPage $listingPage): array => $listingPage->data($route->relativePath ?? ''),
             ),
             MonkwardRoute::KIND_DOC => $context->run(
                 static fn (DocPage $docPage): array => $docPage->render($route->relativePath ?? ''),

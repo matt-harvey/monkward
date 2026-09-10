@@ -6,7 +6,7 @@ namespace Monkward\Http;
 
 final readonly class MonkwardRoute
 {
-    public const KIND_INDEX = 'index';
+    public const KIND_LISTING = 'listing';
     public const KIND_DOC = 'doc';
     public const KIND_ASSET = 'asset';
 
@@ -18,9 +18,9 @@ final readonly class MonkwardRoute
     ) {
     }
 
-    public static function index(): self
+    public static function listing(string $relativeDir): self
     {
-        return new self(self::KIND_INDEX, 'index');
+        return new self(self::KIND_LISTING, 'listing', relativePath: $relativeDir);
     }
 
     public static function doc(string $relativePath): self

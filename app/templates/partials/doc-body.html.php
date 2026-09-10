@@ -7,7 +7,6 @@ use SubstancePHP\HTTP\Renderer\HtmlRenderer;
 /** @var HtmlRenderer $this */
 /** @var string $title */
 /** @var string $rel */
-/** @var string $dir */
 /** @var string $html */
 ?>
 <article class="doc">

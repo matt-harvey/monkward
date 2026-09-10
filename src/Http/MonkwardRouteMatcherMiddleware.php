@@ -42,7 +42,7 @@ final readonly class MonkwardRouteMatcherMiddleware implements MiddlewareInterfa
         $trimmed = \trim($path, '/');
 
         if ($trimmed === '') {
-            return MonkwardRoute::index();
+            return MonkwardRoute::listing('');
         }
 
         $decoded = [];
@@ -62,6 +62,6 @@ final readonly class MonkwardRouteMatcherMiddleware implements MiddlewareInterfa
             return MonkwardRoute::doc(\implode('/', $decoded));
         }
 
-        UserError::throw(404);
+        return MonkwardRoute::listing(\implode('/', $decoded));
     }
 }

@@ -37,7 +37,7 @@ Options:
 
 ```bash
 monkward                     # serve the current directory
-monkward docs/               # serve docs/ recursively
+monkward docs/               # browse docs/ (click into subdirectories)
 monkward README.md           # serve a single markdown file
 monkward --open              # also open the default browser at the URL
 
@@ -52,9 +52,9 @@ monkward --help              # full help
 Files are re-read on every request, so edits show up on refresh. Stop the
 server with `Ctrl+C`.
 
-When opened in a directory, monkward will render a file browser; you can click
-around to view the Markdown files contained recursively in that directory. Non-Markdown files
-are intentionally not shown; as are any sub-directories that lack Markdown files.
+When opened in a directory, monkward renders a one-level file browser:
+directories first (click to descend), then files. Markdown files are
+highlighted and clickable; other file names are shown but not linked.
 
 ## Themes and configuration
 
@@ -88,8 +88,10 @@ override the config file.
 ## Ignored directories
 
 The `ignore` key in `config.toml` is the full list of directory names monkward
-skips. You can edit this list as you see fit. For a one-off directory ignoring, you can pass
-`--ignore=other_dir` to additionally ignore `other_dir` for that run.
+skips — ignored directories are neither listed nor navigable, and files inside
+them can't be served directly. You can edit this list as you see fit. For a
+one-off addition, pass `--ignore=other_dir` to also ignore `other_dir` for
+that run.
 
 ```bash
 monkward --ignore=build,tmp

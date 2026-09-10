@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Monkward\Http;
 
 use Monkward\Markdown\MarkdownRenderer;
-use Monkward\Site\FileScanner;
-use Monkward\Site\SiteIndex;
+use Monkward\Site\DirectoryLister;
 use Psr\Http\Message\ResponseFactoryInterface;
 use SubstancePHP\Container\Container;
 use SubstancePHP\HTTP\ContextFactoryInterface;
@@ -33,26 +32,22 @@ final class MonkwardProvider implements ProviderInterface
                 headingIds: $c->get('monkward.heading-ids'),
             ),
 
-            FileScanner::class => static fn (Container $c): FileScanner => new FileScanner(
-                ignore: $c->get('monkward.ignore'),
-            ),
-
-            SiteIndex::class => static fn (Container $c): SiteIndex => new SiteIndex(
+            DirectoryLister::class => static fn (Container $c): DirectoryLister => new DirectoryLister(
                 root: $c->get('monkward.target'),
-                scanner: $c->get(FileScanner::class),
+                ignore: $c->get('monkward.ignore'),
             ),
 
             DocPage::class => static fn (Container $c): DocPage => new DocPage(
                 root: $c->get('monkward.target'),
                 singleFile: $c->get('monkward.single-file'),
                 markdown: $c->get(MarkdownRenderer::class),
-                scanner: $c->get(FileScanner::class),
+                lister: $c->get(DirectoryLister::class),
             ),
 
-            IndexPage::class => static fn (Container $c): IndexPage => new IndexPage(
+            ListingPage::class => static fn (Container $c): ListingPage => new ListingPage(
                 root: $c->get('monkward.target'),
                 singleFile: $c->get('monkward.single-file'),
-                siteIndex: $c->get(SiteIndex::class),
+                lister: $c->get(DirectoryLister::class),
                 docPage: $c->get(DocPage::class),
             ),
 

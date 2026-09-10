@@ -157,34 +157,35 @@ a:hover {
   padding: 0;
 }
 
-.tree .tree {
-  margin-left: 1.25rem;
-  padding-left: 0.9rem;
-  border-left: 1px solid var(--border);
-}
-
 .tree li {
   margin: 0.18rem 0;
 }
 
-.tree-dir > .dir-name {
-  color: var(--ink-soft);
-  font-weight: 650;
-  font-size: 0.92rem;
-}
-
-.tree-file a {
+.tree a {
   display: inline-block;
   padding: 0.08rem 0.45rem;
   margin-left: -0.45rem;
   border-radius: 6px;
-  color: var(--ink);
 }
 
-.tree-file a:hover {
+.tree a:hover {
   background: var(--accent-soft);
   color: var(--accent-strong);
   text-decoration: none;
+}
+
+.dir-link {
+  color: var(--ink-soft);
+  font-weight: 650;
+}
+
+.md-link {
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.tree-file.plain span {
+  color: var(--ink-faint);
 }
 
 /* document */

@@ -10,7 +10,7 @@ use SubstancePHP\HTTP\RendererInterface;
 
 /**
  * Maps monkward's tiny route surface onto the substancephp/http templating engine:
- * the root route renders `index.html.php`, every document route renders `doc.html.php`,
+ * directory listings render `listing.html.php`, document routes render `doc.html.php`,
  * error templates pass through untouched, and non-HTML payloads (theme css, favicon)
  * are emitted verbatim.
  */
@@ -34,7 +34,7 @@ final class MonkwardRendererFactory implements RendererFactoryInterface
         }
 
         $templatePath = match (true) {
-            $normalizedRequestPath === 'index' => 'index',
+            $normalizedRequestPath === 'listing' => 'listing',
             \str_starts_with($normalizedRequestPath, 'error') => $normalizedRequestPath,
             default => 'doc',
         };
