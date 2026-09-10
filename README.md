@@ -1,5 +1,8 @@
 # monkward
 
+[![CI](https://github.com/matt-harvey/monkward/actions/workflows/ci.yml/badge.svg)](https://github.com/matt-harvey/monkward/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/matt-harvey/monkward/branch/main/graph/badge.svg)](https://codecov.io/gh/matt-harvey/monkward)
+
 It's 2026 and you're drowning in Markdown files. You need a Markdown browser. One that:
 * Renders on the fly
 * Is invoked with one command

@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: xdebug
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Lint
+        run: composer lint:check
+
+      - name: Static analysis
+        run: composer stan
+
+      - name: Tests with coverage
+        run: mkdir -p build && vendor/bin/phpunit --coverage-clover build/clover.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: build/clover.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
