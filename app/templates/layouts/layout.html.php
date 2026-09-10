@@ -14,7 +14,17 @@ use SubstancePHP\HTTP\Renderer\HtmlRenderer;
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= $this->h($title) ?> · monkward</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" id="theme-style" href="/monkward-theme.css">
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem('monkward-theme'); } catch (e) {}
+  var href = saved
+    ? '/monkward-theme.css?theme=' + encodeURIComponent(saved)
+    : '/monkward-theme.css';
+  document.write('<link rel="stylesheet" id="theme-style" href="' + href + '">');
+})();
+</script>
+<noscript><link rel="stylesheet" href="/monkward-theme.css"></noscript>
 </head>
 <body>
 <header class="site-header">

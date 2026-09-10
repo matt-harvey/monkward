@@ -114,6 +114,11 @@ a:hover {
   font-size: 0.82rem;
 }
 
+.theme-select,
+.theme-select option {
+  cursor: pointer;
+}
+
 .site-main {
   max-width: 860px;
   margin: 0 auto;
