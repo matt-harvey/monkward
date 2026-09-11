@@ -19,7 +19,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Monkward\\": "src/App/"
+            "Monkward\\": "src/Monkward/"
         }
     },
     "bin": [
