@@ -5,7 +5,6 @@
     <file>src</file>
     <file>tests</file>
     <file>bin</file>
-    <file>app</file>
 
     <rule ref="Generic.Files.LineLength">
         <properties>

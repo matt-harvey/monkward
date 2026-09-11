@@ -173,7 +173,7 @@ final class Application
         if ($phar !== '') {
             return $phar;
         }
-        return \dirname(__DIR__, 2) . '/bin/server.php';
+        return \dirname(__DIR__, 3) . '/bin/server.php';
     }
 
     private function startServer(

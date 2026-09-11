@@ -4,9 +4,7 @@
     "compression": "GZ",
     "directories": [
         "src",
-        "vendor",
-        "app",
-        "resources"
+        "vendor"
     ],
     "files": [
         "bin/monkward",

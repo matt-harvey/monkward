@@ -85,7 +85,7 @@ final class ThemeRegistry
 
     public static function builtInThemesDir(): string
     {
-        return \dirname(__DIR__, 2) . '/resources/themes';
+        return \dirname(__DIR__, 2) . '/assets/themes';
     }
 
     private function userThemesDir(): ?string

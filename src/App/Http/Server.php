@@ -12,12 +12,12 @@ final class Server
 {
     public function run(): void
     {
-        $root = \dirname(__DIR__, 2);
+        $root = \dirname(__DIR__, 3);
 
         $app = Application::make(
             env: [],
             actionRoot: '', // unused: monkward supplies its own route middlewares
-            templateRoot: $root . '/app/templates',
+            templateRoot: $root . '/src/templates',
             providers: [
                 SubstanceProvider::class,
                 MonkwardProvider::class,

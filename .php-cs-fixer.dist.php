@@ -8,8 +8,7 @@ use PhpCsFixer\Finder;
 $finder = Finder::create()
     ->in(__DIR__ . '/src')
     ->in(__DIR__ . '/tests')
-    ->in(__DIR__ . '/bin')
-    ->in(__DIR__ . '/app');
+    ->in(__DIR__ . '/bin');
 
 return (new Config())
     ->setRiskyAllowed(true)
